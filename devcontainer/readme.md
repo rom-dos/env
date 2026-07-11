@@ -23,5 +23,5 @@ the built in terminal would login inside the container.
 ## notes
 
 - **overwrites `.devcontainer/`** on every run
-- default shell is fish, zsh available for agents
+- default shell is zsh
 - auth and history persist across rebuilds via docker volumes

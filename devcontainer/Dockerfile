@@ -49,7 +49,6 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     procps \
     sudo \
     zsh \
-    fish \
     unzip \
     openssh-client \
     gh \
@@ -75,7 +74,9 @@ RUN git config --system worktree.useRelativePaths true \
   && git config --system --add safe.directory /workspace
 
 RUN if ! id -u "node" >/dev/null 2>&1; then \
-    useradd -m -s /usr/bin/fish "node"; \
+    useradd -m -s /usr/bin/zsh "node"; \
+  else \
+    usermod -s /usr/bin/zsh "node"; \
   fi
 
 # Ensure default node user has access to the global npm prefix.
@@ -114,7 +115,7 @@ RUN echo '. /etc/profile.d/00-commandhistory.sh' >> /etc/bash.bashrc \
 ENV DEVCONTAINER=true
 
 # Create workspace + agent config dirs and set permissions.
-RUN mkdir -p /workspace /home/node/.claude /home/node/.codex /home/node/.npm /home/node/.config/fish \
+RUN mkdir -p /workspace /home/node/.claude /home/node/.codex /home/node/.npm /home/node/.config \
   && touch /home/node/.zshrc \
   && chown -R node:node /workspace /home/node/.claude /home/node/.codex /home/node/.npm /home/node/.config /home/node/.zshrc
 
@@ -137,7 +138,7 @@ ENV NPM_CONFIG_CACHE=/home/node/.npm
 # Default shell + editor.
 ENV HOME=/home/node
 ENV XDG_CONFIG_HOME=/home/node/.config
-ENV SHELL=/usr/bin/fish
+ENV SHELL=/usr/bin/zsh
 ENV EDITOR=vim
 ENV VISUAL=vim
 
