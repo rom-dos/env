@@ -1,0 +1,31 @@
+{
+  "React Functional Component": {
+    "prefix": "re-fc",
+    "body": [
+      "import React from 'react';",
+      "",
+      "const ${1:ComponentName} = (${2:props}) => {",
+      "  return (",
+      "    <div>",
+      "      $0",
+      "    </div>",
+      "  );",
+      "};",
+      "",
+      "export default ${1:ComponentName};"
+    ],
+    "description": "React functional component"
+  },
+  "useEffect logger": {
+    "prefix": ["re-efl", "re-logger", "logger-useEffect"],
+    "body": [
+      "React.useEffect(() => {",
+      " if (${1:variableToLog}) {",
+      "   console.log('${2:locationOrNote} ${1}')",
+      "   console.log(${1})",
+      "}",
+      "}, [${1}])"
+    ],
+    "description": "useEffect logger for debugging"
+  }
+}

@@ -1,0 +1,339 @@
+{
+  "asterisk": {
+    "prefix": ["star", "asterisk", "fn-star"],
+    "body": "\\*"
+  },
+  "dagger": {
+    "prefix": ["dagger", "fn-dagger"],
+    "body": "†"
+  },
+  "double dagger": {
+    "prefix": ["dd", "double-dagger", "fn-double-dagger"],
+    "body": "‡"
+  },
+  "paragraph symbol": {
+    "prefix": ["paragraph-symbol", "fn-paragraph-symbol"],
+    "body": "§"
+  },
+  "paragraph mark": {
+    "prefix": ["paragraph-mark", "fn-paragraph-mark"],
+    "body": "¶"
+  },
+  "number sign": {
+    "prefix": ["number-sign", "fn-number-sign"],
+    "body": "\\#"
+  },
+  "spades": {
+    "prefix": ["spades", "fn-spades"],
+    "body": "♠"
+  },
+  "hearts": {
+    "prefix": ["hearts", "fn-hearts"],
+    "body": "♥"
+  },
+  "diamonds": {
+    "prefix": ["diamonds", "fn-diamonds"],
+    "body": "♦"
+  },
+  "clubs": {
+    "prefix": ["clubs", "fn-clubs"],
+    "body": "♦"
+  },
+  "eszett": {
+    "prefix": ["eszett", "fn-eszett"],
+    "body": "ß"
+  },
+  "umlaut-o": {
+    "prefix": ["umlaut-o", "fn-umlaut-o"],
+    "body": "ö"
+  },
+  "umlaut-a": {
+    "prefix": ["umlaut-a", "fn-umlaut-a"],
+    "body": "ä"
+  },
+  "umlaut-u": {
+    "prefix": ["umlaut-u", "fn-umlaut-u"],
+    "body": "ü"
+  },
+  "questions": {
+    "prefix": ["question-1"],
+    "body": "What does this even mean?"
+  },
+  "Horizontal Rule": {
+    "prefix": ["hr"],
+    "body": "---"
+  },
+  "date DDMMYY": {
+    "prefix": "ddmmyy-date",
+    "body": ["${CURRENT_DATE}${CURRENT_MONTH}${CURRENT_YEAR}"],
+    "description": "Put the date in DDMMYY format"
+  },
+  "H:M:S time": {
+    "prefix": "hms-time",
+    "body": ["${CURRENT_HOUR}:${CURRENT_MINUTE}:${CURRENT_SECOND}"],
+    "description": "Current time in (H:M:S) format"
+  },
+  "Explain current error": {
+    "prefix": "explain-error",
+    "body": [
+      "I made some changes (see current `git status`). Based on these changes, I get the following error:",
+      "",
+      "${0:error}",
+      "",
+      "Please fix."
+    ],
+    "description": "Explain current error"
+  },
+  "Code Review Prompt": {
+    "prefix": ["prompt-review", "pr-review"],
+    "body": [
+      "# Code Review Request",
+      "",
+      "Please review the following ${1:function/component/module}:",
+      "",
+      "**Focus Areas:**",
+      "- ${2:Performance}",
+      "- ${3:Security}",
+      "- ${4:Best practices}",
+      "",
+      "**Context:** ${5:Additional context here}",
+      "",
+      "```${6:language}",
+      "${7:// Paste code here}",
+      "```",
+      "",
+      "$0"
+    ]
+  },
+  "Refactor Request": {
+    "prefix": ["prompt-refactor", "pr-refactor"],
+    "body": [
+      "# Refactoring Request",
+      "",
+      "Please refactor this ${1:code} to improve ${2:readability/performance/maintainability}.",
+      "",
+      "**Current Issues:**",
+      "- ${3:Issue 1}",
+      "- ${4:Issue 2}",
+      "",
+      "**Goals:**",
+      "- ${5:Goal 1}",
+      "- ${6:Goal 2}",
+      "",
+      "**Constraints:**",
+      "- ${7:Must maintain backward compatibility}",
+      "",
+      "```${8:language}",
+      "${9:// Current code}",
+      "```",
+      "",
+      "$0"
+    ]
+  },
+  "Bug Investigation": {
+    "prefix": ["prompt-bug", "pr-bug"],
+    "body": [
+      "# Bug Investigation",
+      "",
+      "**Issue:** ${1:Brief description of the bug}",
+      "",
+      "**Expected Behavior:** ${2:What should happen}",
+      "",
+      "**Actual Behavior:** ${3:What actually happens}",
+      "",
+      "**Steps to Reproduce:**",
+      "1. ${4:Step 1}",
+      "2. ${5:Step 2}",
+      "3. ${6:Step 3}",
+      "",
+      "**Environment:**",
+      "- ${7:Language/Framework version}",
+      "- ${8:OS/Browser}",
+      "",
+      "**Relevant Code:**",
+      "```${9:language}",
+      "${10:// Code snippet}",
+      "```",
+      "",
+      "$0"
+    ]
+  },
+  "Feature Implementation": {
+    "prefix": ["prompt-feature", "pr-feature"],
+    "body": [
+      "# Feature Implementation Request",
+      "",
+      "**Feature:** ${1:Feature name}",
+      "",
+      "**Description:** ${2:What this feature should do}",
+      "",
+      "**Requirements:**",
+      "- ${3:Requirement 1}",
+      "- ${4:Requirement 2}",
+      "- ${5:Requirement 3}",
+      "",
+      "**Technical Constraints:**",
+      "- ${6:Framework/library limitations}",
+      "- ${7:Performance requirements}",
+      "",
+      "**User Stories:**",
+      "- As a ${8:user type}, I want to ${9:action} so that ${10:benefit}",
+      "",
+      "**Acceptance Criteria:**",
+      "- [ ] ${11:Criterion 1}",
+      "- [ ] ${12:Criterion 2}",
+      "",
+      "$0"
+    ]
+  },
+  "Optimization Request": {
+    "prefix": ["prompt-optimize", "pr-optimize"],
+    "body": [
+      "# Optimization Request",
+      "",
+      "Optimize this ${1:function/query/algorithm} for ${2:speed/memory/scalability}.",
+      "",
+      "**Current Performance:**",
+      "- ${3:Metric 1}: ${4:value}",
+      "- ${5:Metric 2}: ${6:value}",
+      "",
+      "**Target Performance:**",
+      "- ${7:Target metric 1}: ${8:target value}",
+      "",
+      "**Current Implementation:**",
+      "```${9:language}",
+      "${10:// Current code}",
+      "```",
+      "",
+      "**Profiling Data:** ${11:Include profiling info if available}",
+      "",
+      "$0"
+    ]
+  },
+  "Documentation Request": {
+    "prefix": ["prompt-doc", "pr-doc"],
+    "body": [
+      "# Documentation Request",
+      "",
+      "Please document the following ${1:function/class/module}:",
+      "",
+      "**Purpose:** ${2:What does this do?}",
+      "",
+      "**Target Audience:** ${3:Developers/Users/Contributors}",
+      "",
+      "**Documentation Needs:**",
+      "- [ ] ${4:API reference}",
+      "- [ ] ${5:Usage examples}",
+      "- [ ] ${6:Common patterns}",
+      "- [ ] ${7:Edge cases and gotchas}",
+      "",
+      "**Code to Document:**",
+      "```${8:language}",
+      "${9:// Code here}",
+      "```",
+      "",
+      "$0"
+    ]
+  },
+  "Test Case Generation": {
+    "prefix": ["prompt-test", "pr-test"],
+    "body": [
+      "# Test Case Generation",
+      "",
+      "Generate ${1:unit/integration/e2e} tests for the following ${2:function/component}:",
+      "",
+      "**Testing Framework:** ${3:Jest/Vitest/pytest/etc}",
+      "",
+      "**Test Coverage Needed:**",
+      "- [ ] ${4:Happy path}",
+      "- [ ] ${5:Edge cases}",
+      "- [ ] ${6:Error handling}",
+      "- [ ] ${7:Boundary conditions}",
+      "",
+      "**Code Under Test:**",
+      "```${8:language}",
+      "${9:// Code to test}",
+      "```",
+      "",
+      "**Known Edge Cases:** ${10:Describe any specific scenarios to test}",
+      "",
+      "$0"
+    ]
+  },
+  "Architecture Design": {
+    "prefix": ["prompt-arch", "pr-arch"],
+    "body": [
+      "# Architecture Design Request",
+      "",
+      "Design an architecture for ${1:feature/system name}.",
+      "",
+      "**Requirements:**",
+      "- ${2:Requirement 1}",
+      "- ${3:Requirement 2}",
+      "- ${4:Requirement 3}",
+      "",
+      "**Scale:**",
+      "- Users: ${5:number of users}",
+      "- Requests: ${6:requests per second}",
+      "- Data: ${7:data volume}",
+      "",
+      "**Technology Stack:**",
+      "- ${8:Tech 1}",
+      "- ${9:Tech 2}",
+      "",
+      "**Design Considerations:**",
+      "- ${10:Scalability/Security/Cost/Performance}",
+      "",
+      "**Constraints:**",
+      "- ${11:Budget/Timeline/Technology limitations}",
+      "",
+      "$0"
+    ]
+  },
+  "Quick Analysis": {
+    "prefix": ["prompt-analyze", "pr-analyze"],
+    "body": [
+      "Analyze this ${1:code/architecture/approach} and identify:",
+      "",
+      "1. ${2:Strengths}",
+      "2. ${3:Weaknesses}",
+      "3. ${4:Potential improvements}",
+      "4. ${5:Security concerns}",
+      "",
+      "```${6:language}",
+      "${7:// Code or description here}",
+      "```",
+      "",
+      "$0"
+    ]
+  },
+  "Explain Code": {
+    "prefix": ["prompt-explain", "pr-explain"],
+    "body": [
+      "# Code Explanation Request",
+      "",
+      "Please explain this ${1:function/algorithm/pattern} in detail.",
+      "",
+      "**Target Audience:** ${2:Beginner/Intermediate/Advanced} developers",
+      "",
+      "**Focus On:**",
+      "- ${3:How it works}",
+      "- ${4:Why it's designed this way}",
+      "- ${5:When to use it}",
+      "",
+      "```${6:language}",
+      "${7:// Code to explain}",
+      "```",
+      "",
+      "**Specific Questions:**",
+      "- ${8:Question 1}",
+      "- ${9:Question 2}",
+      "",
+      "$0"
+    ]
+  },
+  "Unfortunately, it's ...": {
+    "prefix": ["unfortunately"],
+    "body": ["Unfortunately, it's not ${1:working}."]
+  }
+}

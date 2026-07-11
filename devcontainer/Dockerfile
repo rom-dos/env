@@ -36,7 +36,9 @@ FROM ubuntu:25.10
 ARG TZ
 ARG TARGETARCH
 ARG NVIM_VERSION=v0.12.4
-ENV TZ="${TZ}"
+ENV TZ="${TZ}" \
+    LANG=C.UTF-8 \
+    LC_ALL=C.UTF-8
 
 ARG CLAUDE_CODE_VERSION=latest
 ARG CODEX_VERSION=latest
@@ -45,6 +47,7 @@ ARG CODEX_VERSION=latest
 # Note: we intentionally do NOT install iptables/ipset or ship a firewall script.
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
   apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
     ca-certificates \
     curl \
     less \
@@ -156,6 +159,12 @@ ENV XDG_CONFIG_HOME=/home/node/.config
 ENV SHELL=/usr/bin/zsh
 ENV EDITOR=nvim
 ENV VISUAL=nvim
+
+# Install the shared Neovim configuration.
+RUN mkdir -p /home/node/.config/nvim \
+  && curl -fsSL https://github.com/rom-dos/env/archive/refs/heads/master.tar.gz \
+  | tar -xz --strip-components=4 -C /home/node/.config/nvim \
+      env-master/home/.config/nvim
 
 # Install the shared tmux configuration and its plugin manager.
 RUN curl -fsSL https://raw.githubusercontent.com/rom-dos/env/master/home/.tmux.conf \

@@ -1,0 +1,10 @@
+{
+  "console.log() logger": {
+    "prefix": "logger",
+    "body": [
+      "console.log('${1:locationOrNote} ${2:value}')",
+      "console.log(${2})"
+    ],
+    "description": "console.log() logger"
+  }
+}
