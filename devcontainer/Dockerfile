@@ -142,6 +142,11 @@ ENV SHELL=/usr/bin/zsh
 ENV EDITOR=vim
 ENV VISUAL=vim
 
+# Install the shared tmux configuration and its plugin manager.
+RUN curl -fsSL https://raw.githubusercontent.com/rom-dos/env/master/home/.tmux.conf \
+    -o /home/node/.tmux.conf \
+  && git clone https://github.com/tmux-plugins/tpm /home/node/.tmux/plugins/tpm
+
 # Install uv
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /bin/uv
 
