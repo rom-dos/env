@@ -34,6 +34,8 @@ RUN --mount=type=cache,target=/root/.npm \
 FROM ubuntu:25.10
 
 ARG TZ
+ARG TARGETARCH
+ARG NVIM_VERSION=v0.12.4
 ENV TZ="${TZ}"
 
 ARG CLAUDE_CODE_VERSION=latest
@@ -53,7 +55,6 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     openssh-client \
     gh \
     jq \
-    vim \
     tmux \
     ncurses-term \
     git \
@@ -64,6 +65,20 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
 RUN if command -v fdfind >/dev/null 2>&1 && [ ! -e /usr/local/bin/fd ]; then \
     ln -s /usr/bin/fdfind /usr/local/bin/fd; \
   fi
+
+# Install the pinned Neovim release for the target architecture.
+RUN case "${TARGETARCH}" in \
+      amd64) nvim_arch=x86_64 ;; \
+      arm64) nvim_arch=arm64 ;; \
+      *) echo "Unsupported architecture: ${TARGETARCH}" >&2; exit 1 ;; \
+    esac \
+  && curl -fsSL "https://github.com/neovim/neovim/releases/download/${NVIM_VERSION}/nvim-linux-${nvim_arch}.tar.gz" \
+    -o /tmp/nvim.tar.gz \
+  && tar -xzf /tmp/nvim.tar.gz -C /opt \
+  && mv "/opt/nvim-linux-${nvim_arch}" /opt/nvim \
+  && ln -s /opt/nvim/bin/nvim /usr/local/bin/nvim \
+  && rm /tmp/nvim.tar.gz \
+  && nvim --version
 
 # Bring in node + npm from the official node image (fast, no apt deps).
 COPY --from=node /usr/local/ /usr/local/
@@ -139,8 +154,8 @@ ENV NPM_CONFIG_CACHE=/home/node/.npm
 ENV HOME=/home/node
 ENV XDG_CONFIG_HOME=/home/node/.config
 ENV SHELL=/usr/bin/zsh
-ENV EDITOR=vim
-ENV VISUAL=vim
+ENV EDITOR=nvim
+ENV VISUAL=nvim
 
 # Install the shared tmux configuration and its plugin manager.
 RUN curl -fsSL https://raw.githubusercontent.com/rom-dos/env/master/home/.tmux.conf \
