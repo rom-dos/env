@@ -58,6 +58,7 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     openssh-client \
     gh \
     jq \
+    luarocks \
     tmux \
     ncurses-term \
     git \
