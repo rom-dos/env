@@ -167,8 +167,10 @@ RUN mkdir -p /home/node/.config/nvim \
   | tar -xz --strip-components=4 -C /home/node/.config/nvim \
       env-master/home/.config/nvim
 
-# Install the shared tmux configuration and its plugin manager.
-RUN curl -fsSL https://raw.githubusercontent.com/rom-dos/env/master/home/.tmux.conf \
+# Install the shared shell and tmux configurations and the tmux plugin manager.
+RUN curl -fsSL https://raw.githubusercontent.com/rom-dos/env/master/home/.zprofile \
+    -o /home/node/.zprofile \
+  && curl -fsSL https://raw.githubusercontent.com/rom-dos/env/master/home/.tmux.conf \
     -o /home/node/.tmux.conf \
   && git clone https://github.com/tmux-plugins/tpm /home/node/.tmux/plugins/tpm
 
