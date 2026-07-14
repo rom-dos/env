@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1.7
 
 # Based on Anthropic's Claude Code devcontainer template, with:
-# - Codex CLI installed
+# - OpenCode installed
 # - Passwordless sudo for the non-root user
 # - NO firewall / network restrictions (internet enabled)
 # - tmux installed
@@ -10,7 +10,6 @@ ARG NODE_IMAGE=node:22-bookworm-slim
 FROM ${NODE_IMAGE} AS node
 
 ARG CLAUDE_CODE_VERSION=latest
-ARG CODEX_VERSION=latest
 
 # Build-time npm defaults.
 ENV NPM_CONFIG_PREFIX=/usr/local/share/npm-global \
@@ -23,11 +22,11 @@ ENV NPM_CONFIG_PREFIX=/usr/local/share/npm-global \
 
 RUN mkdir -p /usr/local/share/npm-global
 
-# Install Claude Code + Codex CLI + pnpm in the node stage for faster rebuilds.
+# Install Claude Code + OpenCode + pnpm in the node stage for faster rebuilds.
 RUN --mount=type=cache,target=/root/.npm \
   npm install -g \
     "@anthropic-ai/claude-code@${CLAUDE_CODE_VERSION}" \
-    "@openai/codex@${CODEX_VERSION}" \
+    opencode-ai \
   && corepack enable --install-directory /usr/local/share/npm-global/bin \
   && corepack prepare pnpm@latest --activate
 
@@ -39,9 +38,6 @@ ARG NVIM_VERSION=v0.12.4
 ENV TZ="${TZ}" \
     LANG=C.UTF-8 \
     LC_ALL=C.UTF-8
-
-ARG CLAUDE_CODE_VERSION=latest
-ARG CODEX_VERSION=latest
 
 # Install common dev tools.
 # Note: we intentionally do NOT install iptables/ipset or ship a firewall script.
@@ -134,9 +130,9 @@ RUN echo '. /etc/profile.d/00-commandhistory.sh' >> /etc/bash.bashrc \
 ENV DEVCONTAINER=true
 
 # Create workspace + agent config dirs and set permissions.
-RUN mkdir -p /workspace /home/node/.claude /home/node/.codex /home/node/.npm /home/node/.config \
+RUN mkdir -p /workspace /home/node/.claude /home/node/.npm /home/node/.config \
   && touch /home/node/.zshrc \
-  && chown -R node:node /workspace /home/node/.claude /home/node/.codex /home/node/.npm /home/node/.config /home/node/.zshrc
+  && chown -R node:node /workspace /home/node/.claude /home/node/.npm /home/node/.config /home/node/.zshrc
 
 WORKDIR /workspace
 
