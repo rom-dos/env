@@ -22,10 +22,11 @@ ENV NPM_CONFIG_PREFIX=/usr/local/share/npm-global \
 
 RUN mkdir -p /usr/local/share/npm-global
 
-# Install Claude Code + OpenCode + pnpm in the node stage for faster rebuilds.
+# Install global npm tools in the node stage for faster rebuilds.
 RUN --mount=type=cache,target=/root/.npm \
   npm install -g \
     "@anthropic-ai/claude-code@${CLAUDE_CODE_VERSION}" \
+    hunkdiff \
     opencode-ai \
   && corepack enable --install-directory /usr/local/share/npm-global/bin \
   && corepack prepare pnpm@latest --activate
@@ -56,8 +57,12 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     jq \
     luarocks \
     tmux \
+    nnn \
     ncurses-term \
     git \
+    git-delta \
+    lazygit \
+    fzf \
     ripgrep \
     zoxide \
     fd-find \
@@ -65,6 +70,9 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
 RUN if command -v fdfind >/dev/null 2>&1 && [ ! -e /usr/local/bin/fd ]; then \
     ln -s /usr/bin/fdfind /usr/local/bin/fd; \
   fi
+
+# Install Starship system-wide without prompting.
+RUN curl -sS https://starship.rs/install.sh | sh -s -- --yes
 
 # Install the pinned Neovim release for the target architecture.
 RUN case "${TARGETARCH}" in \
@@ -157,11 +165,11 @@ ENV SHELL=/usr/bin/zsh
 ENV EDITOR=nvim
 ENV VISUAL=nvim
 
-# Install the shared Neovim configuration.
-RUN mkdir -p /home/node/.config/nvim \
+# Install the shared application configurations.
+RUN mkdir -p /home/node/.config \
   && curl -fsSL https://github.com/rom-dos/env/archive/refs/heads/master.tar.gz \
-  | tar -xz --strip-components=4 -C /home/node/.config/nvim \
-      env-master/home/.config/nvim
+  | tar -xz --strip-components=3 -C /home/node/.config \
+      env-master/home/.config
 
 # Install the shared shell and tmux configurations and the tmux plugin manager.
 RUN curl -fsSL https://raw.githubusercontent.com/rom-dos/env/master/home/.zprofile \
