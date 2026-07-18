@@ -162,7 +162,7 @@ case "$cmd" in
   rebuild)
     copy_template "$REPO_PATH" "$TEMPLATE_DIR"
     require_devcontainer_cli
-    devcontainer up --workspace-folder "$REPO_PATH" --remove-existing-container
+    devcontainer up --workspace-folder "$REPO_PATH" --remove-existing-container --build-no-cache
     devcontainer exec --workspace-folder "$REPO_PATH" tmux new -As agent
     ;;
   up)
