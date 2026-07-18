@@ -3,3 +3,5 @@ home/.config/zsh/.zsh_history
 home/.config/zsh/.zcompdump
 home/.config/zsh/.zcompdump*
 .devcontainer
+.wt-parent
+.wt-tmux-window
