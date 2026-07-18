@@ -13,21 +13,21 @@ ARG CLAUDE_CODE_VERSION=latest
 
 # Build-time npm defaults.
 ENV NPM_CONFIG_PREFIX=/usr/local/share/npm-global \
-    NPM_CONFIG_FUND=false \
-    NPM_CONFIG_AUDIT=false \
-    NPM_CONFIG_UPDATE_NOTIFIER=false \
-    NPM_CONFIG_PROGRESS=false \
-    NPM_CONFIG_CACHE=/root/.npm \
-    PATH="/usr/local/share/npm-global/bin:${PATH}"
+  NPM_CONFIG_FUND=false \
+  NPM_CONFIG_AUDIT=false \
+  NPM_CONFIG_UPDATE_NOTIFIER=false \
+  NPM_CONFIG_PROGRESS=false \
+  NPM_CONFIG_CACHE=/root/.npm \
+  PATH="/usr/local/share/npm-global/bin:${PATH}"
 
 RUN mkdir -p /usr/local/share/npm-global
 
 # Install global npm tools in the node stage for faster rebuilds.
 RUN --mount=type=cache,target=/root/.npm \
   npm install -g \
-    "@anthropic-ai/claude-code@${CLAUDE_CODE_VERSION}" \
-    hunkdiff \
-    opencode-ai \
+  "@anthropic-ai/claude-code@${CLAUDE_CODE_VERSION}" \
+  hunkdiff \
+  opencode-ai \
   && corepack enable --install-directory /usr/local/share/npm-global/bin \
   && corepack prepare pnpm@latest --activate
 
@@ -37,38 +37,38 @@ ARG TZ
 ARG TARGETARCH
 ARG NVIM_VERSION=v0.12.4
 ENV TZ="${TZ}" \
-    LANG=C.UTF-8 \
-    LC_ALL=C.UTF-8
+  LANG=C.UTF-8 \
+  LC_ALL=C.UTF-8
 
 # Install common dev tools.
 # Note: we intentionally do NOT install iptables/ipset or ship a firewall script.
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
   apt-get update && apt-get install -y --no-install-recommends \
-    build-essential \
-    ca-certificates \
-    curl \
-    less \
-    procps \
-    sudo \
-    zsh \
-    unzip \
-    openssh-client \
-    gh \
-    jq \
-    luarocks \
-    tmux \
-    nnn \
-    ncurses-term \
-    git \
-    git-delta \
-    lazygit \
-    fzf \
-    ripgrep \
-    zoxide \
-    fd-find \
+  build-essential \
+  ca-certificates \
+  curl \
+  less \
+  procps \
+  sudo \
+  zsh \
+  unzip \
+  openssh-client \
+  gh \
+  jq \
+  luarocks \
+  tmux \
+  nnn \
+  ncurses-term \
+  git \
+  git-delta \
+  lazygit \
+  fzf \
+  ripgrep \
+  zoxide \
+  fd-find \
   && rm -rf /var/lib/apt/lists/*
 RUN if command -v fdfind >/dev/null 2>&1 && [ ! -e /usr/local/bin/fd ]; then \
-    ln -s /usr/bin/fdfind /usr/local/bin/fd; \
+  ln -s /usr/bin/fdfind /usr/local/bin/fd; \
   fi
 
 # Install Starship system-wide without prompting.
@@ -76,12 +76,12 @@ RUN curl -sS https://starship.rs/install.sh | sh -s -- --yes
 
 # Install the pinned Neovim release for the target architecture.
 RUN case "${TARGETARCH}" in \
-      amd64) nvim_arch=x86_64 ;; \
-      arm64) nvim_arch=arm64 ;; \
-      *) echo "Unsupported architecture: ${TARGETARCH}" >&2; exit 1 ;; \
-    esac \
+  amd64) nvim_arch=x86_64 ;; \
+  arm64) nvim_arch=arm64 ;; \
+  *) echo "Unsupported architecture: ${TARGETARCH}" >&2; exit 1 ;; \
+  esac \
   && curl -fsSL "https://github.com/neovim/neovim/releases/download/${NVIM_VERSION}/nvim-linux-${nvim_arch}.tar.gz" \
-    -o /tmp/nvim.tar.gz \
+  -o /tmp/nvim.tar.gz \
   && tar -xzf /tmp/nvim.tar.gz -C /opt \
   && mv "/opt/nvim-linux-${nvim_arch}" /opt/nvim \
   && ln -s /opt/nvim/bin/nvim /usr/local/bin/nvim \
@@ -97,9 +97,9 @@ RUN git config --system worktree.useRelativePaths true \
   && git config --system --add safe.directory /workspace
 
 RUN if ! id -u "node" >/dev/null 2>&1; then \
-    useradd -m -s /usr/bin/zsh "node"; \
+  useradd -m -s /usr/bin/zsh "node"; \
   else \
-    usermod -s /usr/bin/zsh "node"; \
+  usermod -s /usr/bin/zsh "node"; \
   fi
 
 # Ensure default node user has access to the global npm prefix.
@@ -139,8 +139,7 @@ ENV DEVCONTAINER=true
 
 # Create workspace + agent config dirs and set permissions.
 RUN mkdir -p /workspace /home/node/.claude /home/node/.npm /home/node/.config \
-  && touch /home/node/.zshrc \
-  && chown -R node:node /workspace /home/node/.claude /home/node/.npm /home/node/.config /home/node/.zshrc
+  && chown -R node:node /workspace /home/node/.claude /home/node/.npm /home/node/.config
 
 WORKDIR /workspace
 
@@ -148,9 +147,9 @@ WORKDIR /workspace
 ENV NPM_CONFIG_PREFIX=/usr/local/share/npm-global
 ENV PATH="${PATH}:/usr/local/share/npm-global/bin"
 ENV NPM_CONFIG_FUND=false \
-    NPM_CONFIG_AUDIT=false \
-    NPM_CONFIG_UPDATE_NOTIFIER=false \
-    NPM_CONFIG_PROGRESS=false
+  NPM_CONFIG_AUDIT=false \
+  NPM_CONFIG_UPDATE_NOTIFIER=false \
+  NPM_CONFIG_PROGRESS=false
 
 # Switch to non-root for normal dev.
 USER node
@@ -160,7 +159,7 @@ ENV NPM_CONFIG_CACHE=/home/node/.npm
 
 # Default shell + editor.
 ENV HOME=/home/node
-ENV XDG_CONFIG_HOME=/home/node/.config
+ENV XDG_CONFIG_HOME=$HOME/.config
 ENV SHELL=/usr/bin/zsh
 ENV EDITOR=nvim
 ENV VISUAL=nvim
@@ -169,13 +168,13 @@ ENV VISUAL=nvim
 RUN mkdir -p /home/node/.config \
   && curl -fsSL https://github.com/rom-dos/env/archive/refs/heads/master.tar.gz \
   | tar -xz --strip-components=3 -C /home/node/.config \
-      env-master/home/.config
+  env-master/home/.config
 
 # Install the shared shell and tmux configurations and the tmux plugin manager.
 RUN curl -fsSL https://raw.githubusercontent.com/rom-dos/env/master/home/.zprofile \
-    -o /home/node/.zprofile \
+  -o /home/node/.zprofile \
   && curl -fsSL https://raw.githubusercontent.com/rom-dos/env/master/home/.tmux.conf \
-    -o /home/node/.tmux.conf \
+  -o /home/node/.tmux.conf \
   && git clone https://github.com/tmux-plugins/tpm /home/node/.tmux/plugins/tpm
 
 # Install uv

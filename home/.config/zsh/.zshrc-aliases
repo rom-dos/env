@@ -1,0 +1,161 @@
+# --- zsh aliases --- #
+
+# general
+alias c="clear"
+alias cc="clear && cd ~"
+alias e.="exit"
+alias la="ls -al"
+alias sz="source ~/.config/zsh/.zshrc && echo '.zshrc updated.'"
+alias hist='eval $(history | fzf | sed "s/^[ ]*[0-9]*[ ]*//")'
+alias h.="hist"
+
+alias af="alias | fzf"
+alias help="run-help"
+alias mk="mkdir -p"
+alias size="du -h | fzf"
+
+# programs
+alias f="nnn -ca -H -d"
+alias mu="ncmpcpp"
+alias z="zoxide"
+alias lg="lazygit"
+
+# opencode
+alias oc="opencode"
+alias ocu="opencode upgrade"
+alias ocp="opencode --port"
+
+# hunk
+alias hd="hunk diff --theme vesper"
+alias hs="hunk show --theme vesper"
+
+# tmux
+alias attach="tmux attach -t"
+
+# (neo)vim
+alias v="nvim"
+alias v.='nvim $(fzf)'
+
+# git
+alias g="git"
+alias gb="git branch"
+alias gc="git checkout"
+alias gl="git log"
+alias gl1="git log --oneline"
+alias gp="git pull"
+alias gs="git status"
+alias gd="git diff"
+alias gcm="git commit"
+alias grb2="git rebase -i HEAD~2"
+alias fgc='git checkout $(git branch | fzf)'
+alias fgm='git merge $(git branch | fzf)'
+alias ga.="git add ."
+alias gdno="git diff --name-only"
+alias gwl="git worktree list"
+alias gwp="git worktree prune"
+alias gcp="git cherry-pick"
+alias gcd="git checkout develop"
+alias gcpn="git cherry-pick -n"
+
+# yarn
+alias yi="yarn install"
+alias yb="yarn build"
+alias yt="yarn test"
+alias ytw="yarn test --watch"
+alias yf="yarn flow"
+alias yl="yarn lint"
+alias yp="yarn prettier"
+alias yd="yarn dev"
+
+alias assume=". assume"
+
+if [[ "$OSTYPE" == "darwin"* ]]; then
+  source $HOME/.config/zsh/.task-aliases
+
+  # timewarrior
+  alias twt="timew summary"
+  alias twy="timew summary yesterday"
+
+  # termdown
+  alias td="termdown"
+  alias td1="termdown 1min"
+  alias td5="termdown 5min"
+  alias td15="termdown 15min"
+  alias td30="termdown 30min"
+  alias td60="termdown 60min"
+
+  # brew services
+  alias rmpd="brew services restart mpd"
+  alias startmpd="brew services start mpd"
+  alias stopmpd="brew services stop mpd"
+  alias ryabai="brew services restart yabai"
+  alias ry="brew services restart yabai"
+
+  alias rcoreaudio="sudo killall coreaudiod"
+
+  alias bg="bun run --cwd $HOME/workspace/source/bg $HOME/workspace/source/bg/src/index.tsx"
+  alias rss="bun run --cwd $HOME/workspace/source/rss-tui $HOME/workspace/source/rss-tui/src/index.tsx"
+  alias coin="bun run --cwd $HOME/workspace/source/chance/ $HOME/workspace/source/chance/src/index.tsx"
+
+  alias ytdlp="yt-dlp --js-runtimes bun"
+  alias ytdl="ytdlp --cookies-from-browser=brave --download-archive downloaded.txt --no-post-overwrites --write-info-json -ciw -o \"%(title)s.%(ext)s\" "
+  alias ytdla="ytdlp --cookies-from-browser=brave --no-post-overwrites -ciwx -o \"%(title)s.%(ext)s\" -t mp3 --audio-quality best"
+fi
+
+# Report function for timewarrior using export and jq
+rp() {
+  local tag="$1"
+  local period="$2"
+  local range=""
+  
+  # Set the date range based on period
+  case "$period" in
+    "today")
+      range="today"
+      ;;
+    "yesterday")
+      range="yesterday"
+      ;;
+    "week")
+      range="week"
+      ;;
+    "lastweek")
+      range="sow - 1w to eow - 1w"
+      ;;
+    "month")
+      range="month"
+      ;;
+    "lastmonth")
+      range="som - 1m to eom - 1m"
+      ;;
+    "year")
+      range="year"
+      ;;
+    "lastyear")
+      range="soy - 1y to eoy - 1y"
+      ;;
+    *)
+      echo "Usage: rp <tag> <period>"
+      echo "Periods: today, yesterday, week, lastweek, month, lastmonth, year, lastyear"
+      return 1
+      ;;
+  esac
+  
+  # Get timewarrior export data and filter with jq
+  local output=$(timew export "$range" 2>/dev/null | jq -r --arg tag "$tag" '
+    .[] |
+    select(.tags != null) |
+    select(any(.tags[]; ascii_downcase | contains($tag | ascii_downcase))) |
+    select(.end != null) |
+    ((.end | strptime("%Y%m%dT%H%M%SZ") | mktime) - (.start | strptime("%Y%m%dT%H%M%SZ") | mktime))
+  ')
+  
+  if [[ -n "$output" && "$output" != "" ]]; then
+    # Sum all the durations (in seconds) and convert to hours
+    local total_seconds=$(echo "$output" | tr '\n' '+' | sed 's/+$//' | bc -l 2>/dev/null || echo "0")
+    local total_hours=$(echo "scale=2; $total_seconds / 3600" | bc -l 2>/dev/null || echo "0.00")
+    echo "Total hours for '$tag' ($period): $total_hours"
+  else
+    echo "No time tracked for '$tag' in period '$period'"
+  fi
+}
