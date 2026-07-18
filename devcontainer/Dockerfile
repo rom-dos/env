@@ -97,20 +97,20 @@ RUN node -v && npm -v
 RUN git config --system worktree.useRelativePaths true \
   && git config --system --add safe.directory /workspace
 
-RUN if ! id -u "node" >/dev/null 2>&1; then \
-  useradd -m -s /usr/bin/zsh "node"; \
+RUN if ! id -u "sbox" >/dev/null 2>&1; then \
+  useradd -m -s /usr/bin/zsh "sbox"; \
   else \
-  usermod -s /usr/bin/zsh "node"; \
+  usermod -s /usr/bin/zsh "sbox"; \
   fi
 
-# Ensure default node user has access to the global npm prefix.
+# Ensure the default sbox user has access to the global npm prefix.
 RUN mkdir -p /usr/local/share/npm-global \
-  && chown -R "node:node" /usr/local/share
+  && chown -R "sbox:sbox" /usr/local/share
 
 # Persist shell history across container rebuilds.
 RUN mkdir -p /commandhistory \
   && touch /commandhistory/.bash_history /commandhistory/.zsh_history \
-  && chown -R "node:node" /commandhistory \
+  && chown -R "sbox:sbox" /commandhistory \
   && cat >/etc/profile.d/00-commandhistory.sh <<'EOF'
 # Persist interactive shell history in /commandhistory.
 if [ -d /commandhistory ]; then
@@ -139,8 +139,8 @@ RUN echo '. /etc/profile.d/00-commandhistory.sh' >> /etc/bash.bashrc \
 ENV DEVCONTAINER=true
 
 # Create workspace + agent config dirs and set permissions.
-RUN mkdir -p /workspace /home/node/.claude /home/node/.npm /home/node/.config \
-  && chown -R node:node /workspace /home/node/.claude /home/node/.npm /home/node/.config
+RUN mkdir -p /workspace /home/sbox/.claude /home/sbox/.npm /home/sbox/.config \
+  && chown -R sbox:sbox /workspace /home/sbox/.claude /home/sbox/.npm /home/sbox/.config
 
 WORKDIR /workspace
 
@@ -153,43 +153,43 @@ ENV NPM_CONFIG_FUND=false \
   NPM_CONFIG_PROGRESS=false
 
 # Switch to non-root for normal dev.
-USER node
+USER sbox
 
-# Runtime npm cache should be writable by node.
-ENV NPM_CONFIG_CACHE=/home/node/.npm
+# Runtime npm cache should be writable by sbox.
+ENV NPM_CONFIG_CACHE=/home/sbox/.npm
 
 # Default shell + editor.
-ENV HOME=/home/node
+ENV HOME=/home/sbox
 ENV XDG_CONFIG_HOME=$HOME/.config
 ENV SHELL=/usr/bin/zsh
 ENV EDITOR=nvim
 ENV VISUAL=nvim
 
 # Install the shared application configurations.
-RUN mkdir -p /home/node/.config \
+RUN mkdir -p /home/sbox/.config \
   && curl -fsSL https://github.com/rom-dos/env/archive/refs/heads/master.tar.gz \
-  | tar -xz --strip-components=3 -C /home/node/.config \
+  | tar -xz --strip-components=3 -C /home/sbox/.config \
   env-master/home/.config
 
 # Install the shared shell and tmux configurations and the tmux plugin manager.
 RUN curl -fsSL https://raw.githubusercontent.com/rom-dos/env/master/home/.zprofile \
-  -o /home/node/.zprofile \
+  -o /home/sbox/.zprofile \
   && curl -fsSL https://raw.githubusercontent.com/rom-dos/env/master/home/.tmux.conf \
-  -o /home/node/.tmux.conf \
-  && git clone https://github.com/tmux-plugins/tpm /home/node/.tmux/plugins/tpm
+  -o /home/sbox/.tmux.conf \
+  && git clone https://github.com/tmux-plugins/tpm /home/sbox/.tmux/plugins/tpm
 
 # Install uv
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /bin/uv
 
-# Ensure uv is on PATH for the node user.
-ENV PATH="/home/node/.local/bin:${PATH}"
+# Ensure uv is on PATH for the sbox user.
+ENV PATH="/home/sbox/.local/bin:${PATH}"
 
 # Preinstall managed Python for uv.
 RUN uv python install 3.14
 
 # Passwordless sudo for the non-root user (for unattended / automation workflows).
 USER root
-RUN echo "node ALL=(root) NOPASSWD: ALL" > /etc/sudoers.d/yolo \
+RUN echo "sbox ALL=(root) NOPASSWD: ALL" > /etc/sudoers.d/yolo \
   && chmod 0440 /etc/sudoers.d/yolo
 
-USER node
+USER sbox
