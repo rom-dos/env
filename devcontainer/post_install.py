@@ -115,8 +115,17 @@ def install_tmux_config() -> None:
     log(f"installed tmux config to {tmux_dest}")
 
 
+def install_tmux_plugins() -> None:
+    installer = (
+        Path.home() / ".tmux" / "plugins" / "tpm" / "bin" / "install_plugins"
+    )
+    subprocess.run([str(installer)], check=True)
+    log("installed tmux plugins")
+
+
 def main() -> None:
     install_tmux_config()
+    install_tmux_plugins()
     ensure_dir_ownership(Path("/commandhistory"))
     ensure_dir_ownership(Path.home() / ".claude")
     ensure_dir_ownership(Path.home() / ".config" / "gh")
