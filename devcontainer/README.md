@@ -11,7 +11,8 @@ based on anthropic's claude code devcontainer.
 
 ## quickstart
 
-install `./devcontainer/install.sh self-install`
+install `./devcontainer/install.sh self-install`. rerun this command after updating
+the template checkout so the installed `devc` and its bundled files stay current.
 
 run `devc <repo>` or `devc .` inside project folder.
 

@@ -21,7 +21,7 @@ USAGE
 }
 
 SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
-TEMPLATE_FILES=(Dockerfile devcontainer.json post_install.py)
+TEMPLATE_FILES=(Dockerfile devcontainer.json post_install.py .zshrc-functions)
 
 if [[ "${SYSTEM:-}" == "work" ]]; then
   DEFAULT_AGENT="claude --dangerously-skip-permissions"
@@ -59,6 +59,19 @@ find_template_dir() {
   die "template dir not found (set DEVC_TEMPLATE_DIR or run devc self-install)"
 }
 
+template_file_path() {
+  local src_dir="$1"
+  local file="$2"
+
+  if [[ -f "$src_dir/$file" ]]; then
+    printf '%s\n' "$src_dir/$file"
+  elif [[ "$file" == ".zshrc-functions" && -f "$src_dir/../home/.config/zsh/$file" ]]; then
+    printf '%s\n' "$src_dir/../home/.config/zsh/$file"
+  else
+    return 1
+  fi
+}
+
 copy_template() {
   local repo_path="$1"
   local src_dir="$2"
@@ -66,13 +79,14 @@ copy_template() {
   local staging_dir
 
   for f in "${TEMPLATE_FILES[@]}"; do
-    [[ -f "$src_dir/$f" ]] || die "missing template file: $src_dir/$f"
+    template_file_path "$src_dir" "$f" >/dev/null \
+      || die "missing template file: $f"
   done
 
   staging_dir="$(mktemp -d "$repo_path/.devcontainer.tmp.XXXXXX")"
   chmod 755 "$staging_dir"
   for f in "${TEMPLATE_FILES[@]}"; do
-    if ! cp -f "$src_dir/$f" "$staging_dir/$f"; then
+    if ! cp -f "$(template_file_path "$src_dir" "$f")" "$staging_dir/$f"; then
       rm -rf "$staging_dir"
       return 1
     fi
@@ -109,8 +123,9 @@ self_install() {
   rm -rf "$share_dir"
   mkdir -p "$share_dir"
   for f in "${TEMPLATE_FILES[@]}"; do
-    [[ -f "$template_src/$f" ]] || die "missing template file: $template_src/$f"
-    cp -f "$template_src/$f" "$share_dir/$f"
+    template_file_path "$template_src" "$f" >/dev/null \
+      || die "missing template file: $f"
+    cp -f "$(template_file_path "$template_src" "$f")" "$share_dir/$f"
   done
 
   echo "✓ installed devc to $bin_dir/devc" >&2

@@ -6,6 +6,62 @@ from pathlib import Path
 
 
 class DevcontainerInstallTest(unittest.TestCase):
+    def test_self_install_bundles_repository_worktree_helpers(self) -> None:
+        install_script = Path(__file__).with_name("install.sh")
+        helper_source = install_script.parent.parent / "home/.config/zsh/.zshrc-functions"
+
+        with tempfile.TemporaryDirectory() as temp_dir:
+            home = Path(temp_dir) / "home"
+            home.mkdir()
+            env = os.environ.copy()
+            env["HOME"] = str(home)
+
+            subprocess.run(
+                [str(install_script), "self-install"],
+                check=True,
+                env=env,
+                capture_output=True,
+                text=True,
+            )
+
+            installed_helper = (
+                home / ".local/share/devc/template/.zshrc-functions"
+            )
+            self.assertEqual(
+                installed_helper.read_text(encoding="utf-8"),
+                helper_source.read_text(encoding="utf-8"),
+            )
+
+    def test_install_bundles_repository_worktree_helpers(self) -> None:
+        install_script = Path(__file__).with_name("install.sh")
+        template_dir = install_script.parent
+        helper_source = template_dir.parent / "home/.config/zsh/.zshrc-functions"
+
+        with tempfile.TemporaryDirectory() as temp_dir:
+            repo_path = Path(temp_dir) / "repo"
+            repo_path.mkdir()
+            env = os.environ.copy()
+            env["DEVC_TEMPLATE_DIR"] = str(template_dir)
+
+            subprocess.run(
+                [str(install_script), "install", str(repo_path)],
+                check=True,
+                env=env,
+                capture_output=True,
+                text=True,
+            )
+
+            generated = repo_path / ".devcontainer"
+            self.assertEqual(
+                (generated / ".zshrc-functions").read_text(encoding="utf-8"),
+                helper_source.read_text(encoding="utf-8"),
+            )
+            self.assertIn(
+                "COPY --chown=sbox:sbox .zshrc-functions "
+                "/home/sbox/.config/zsh/.zshrc-functions",
+                (generated / "Dockerfile").read_text(encoding="utf-8"),
+            )
+
     def test_rebuild_disables_build_cache(self) -> None:
         install_script = Path(__file__).with_name("install.sh")
         template_dir = install_script.parent

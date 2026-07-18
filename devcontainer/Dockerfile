@@ -209,6 +209,9 @@ RUN mkdir -p /home/sbox/.config \
   | tar -xz --strip-components=3 -C /home/sbox/.config \
   "env-master/home/.config"
 
+# Keep worktree helpers in lockstep with the installed devcontainer template.
+COPY --chown=sbox:sbox .zshrc-functions /home/sbox/.config/zsh/.zshrc-functions
+
 # Install the shared shell and tmux configurations and the tmux plugin manager.
 RUN curl -fsSL "https://raw.githubusercontent.com/rom-dos/env/master/home/.zprofile" \
   -o /home/sbox/.zprofile \
