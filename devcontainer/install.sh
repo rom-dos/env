@@ -23,6 +23,13 @@ USAGE
 SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 TEMPLATE_FILES=(Dockerfile devcontainer.json post_install.py)
 
+if [[ "${SYSTEM:-}" == "work" ]]; then
+  DEFAULT_AGENT="claude --dangerously-skip-permissions"
+else
+  DEFAULT_AGENT="opencode --port"
+fi
+export DEFAULT_AGENT
+
 die() {
   echo "error: $*" >&2
   exit 1

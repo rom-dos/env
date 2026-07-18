@@ -29,7 +29,8 @@
   ],
   "containerEnv": {
     "NODE_OPTIONS": "--max-old-space-size=4096",
-    "CLAUDE_CONFIG_DIR": "/home/sbox/.claude"
+    "CLAUDE_CONFIG_DIR": "/home/sbox/.claude",
+    "DEFAULT_AGENT": "${localEnv:DEFAULT_AGENT}"
   },
   "workspaceMount": "source=${localWorkspaceFolder},target=/workspace,type=bind,consistency=delegated",
   "workspaceFolder": "/workspace"

@@ -1,0 +1,132 @@
+# git-worktree-helpers
+wt-new() {
+  local part="$1"
+  if [[ -z "$part" ]]; then
+    echo "usage: wt-new <part-name>"
+    return 1
+  fi
+  setopt localoptions nullglob
+
+  local root="$(git rev-parse --show-toplevel)" || return 1
+  local base="$(git branch --show-current)"
+  local dir="${root}--${part}"
+  local branch="${base}--${part}"
+
+  git worktree add -b "$branch" "$dir" "$base" || return 1
+  echo "$root" >"$dir/.wt-parent"
+
+  if [[ -f "$root/.env" ]]; then
+    ln -s "$root/.env" "$dir/.env"
+
+    # Assign a free port from the configured pool so a dev server can run in
+    # parallel across worktrees.
+    local dev_ports=(${=DEV_PORTS})
+    local used_ports=() f p
+    for f in "${root}"--*/.env.local; do
+      p="$(grep -m1 '^PORT=' "$f" | cut -d= -f2)"
+      [[ -n "$p" ]] && used_ports+=("$p")
+    done
+
+    local port=""
+    for p in "${dev_ports[@]}"; do
+      if [[ " ${used_ports[*]} " != *" $p "* ]] && ! lsof -iTCP:"$p" -sTCP:LISTEN >/dev/null 2>&1; then
+        port="$p"
+        break
+      fi
+    done
+    if [[ -z "$port" ]]; then
+      echo "warning: no free port in pool (${dev_ports[*]}); defaulting to $DEFAULT_PORT"
+      port="$DEFAULT_PORT"
+    fi
+
+    local env_template
+    env_template="$(mktemp "${TMPDIR:-/tmp}/wt-env-local.XXXXXX")" || return 1
+    if ! nvim "$env_template"; then
+      rm -f "$env_template"
+      return 1
+    fi
+    sed "s/\\\$port/$port/g" "$env_template" >"$dir/.env.local"
+    local env_status=$?
+    rm -f "$env_template"
+    (( env_status == 0 )) || return "$env_status"
+    echo "dev server port: $port  (dev server in $dir will use it)"
+  fi
+
+  # dependency setup, package-manager aware
+  if [[ -f "$root/pnpm-lock.yaml" ]]; then
+    (cd "$dir" && pnpm install)
+  elif [[ -f "$root/bun.lockb" || -f "$root/bun.lock" ]]; then
+    (cd "$dir" && bun install)
+  elif [[ -d "$root/node_modules" ]]; then
+    # yarn classic / npm: symlink to avoid a full reinstall
+    ln -s "$root/node_modules" "$dir/node_modules"
+  fi
+
+  echo "worktree ready: $dir  (branch: $branch)"
+  if [[ -n "$TMUX" ]]; then
+    local wid
+    wid="$(tmux new-window -n "$part" -c "$dir" -P -F '#{window_id}')"
+    echo "$wid" >"$dir/.wt-tmux-window"
+    tmux set-window-option -t "$wid" automatic-rename off
+    tmux split-window -h -t "${wid}.0" -c "$dir" "$DEFAULT_AGENT"
+    # tmux split-window -v -t "${wid}.0" -c "$dir"
+    tmux select-pane -t "${wid}.1"
+  else
+    cd "$dir"
+  fi
+}
+
+wt-merge() {
+  # run from inside a part worktree
+  # rebases the part branch onto the parent's tip, then fast-forwards the
+  # parent onto it, so the individual commits land with no merge commit.
+  local branch="$(git branch --show-current)"
+  local dir="$(git rev-parse --show-toplevel)"
+  local parent
+  parent="$(cat "$dir/.wt-parent" 2>/dev/null)"
+  if [[ -z "$parent" ]]; then
+    echo "no .wt-parent found — not a wt-new worktree?"
+    return 1
+  fi
+  local parent_branch="$(git -C "$parent" branch --show-current)"
+
+  echo "rebasing $branch onto $parent_branch..."
+  git rebase "$parent_branch" || {
+    echo "rebase conflict — resolve here, run 'git rebase --continue', then re-run wt-merge/wt-done"
+    return 1
+  }
+
+  echo "fast-forwarding $parent_branch to $branch..."
+  (cd "$parent" && git merge --ff-only "$branch")
+}
+
+wt-done() {
+  # merge, then remove the worktree, delete its branch, and close its tmux window
+  local dir="$(git rev-parse --show-toplevel)"
+  local branch="$(git branch --show-current)"
+  local parent="$(cat "$dir/.wt-parent" 2>/dev/null)"
+  local wid="$(cat "$dir/.wt-tmux-window" 2>/dev/null)"
+
+  wt-merge || {
+    echo "merge failed — resolve conflicts in $parent, then run wt-done manually"
+    return 1
+  }
+
+  cd "$parent" || return 1
+  git worktree remove "$dir" --force
+  git branch -d "$branch"
+  echo "removed worktree and branch for $branch"
+
+  if [[ -n "$TMUX" && -n "$wid" ]]; then
+    tmux kill-window -t "$wid"
+  fi
+}
+
+wt-list() {
+  git worktree list
+}
+
+wt-prune() {
+  git worktree prune
+  echo "pruned stale worktree metadata"
+}

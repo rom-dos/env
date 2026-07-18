@@ -8,6 +8,7 @@ bindkey -v
 
 source $HOME/.zprofile
 source $XDG_CONFIG_HOME/zsh/.zshrc-aliases
+source $XDG_CONFIG_HOME/zsh/.zshrc-functions
 
 if [[ "$OSTYPE" == "darwin"* ]]; then
   export HOMEBREW_NO_AUTO_UPDATE=1
@@ -50,6 +51,9 @@ export GITHUB_TOKEN=$_GITHUB_TOKEN
 export GITHUB_USER_NAME="$_GITHUB_USER_NAME"
 
 export N_PRESERVE_NPM=1
+
+export DEFAULT_PORT="8080"
+export DEV_PORTS="8080 8081 8082 8083 8084 8085"
 
 # zsh history
 HISTSIZE=10000
