@@ -9,12 +9,23 @@ wt-new() {
 
   local root="$(git rev-parse --show-toplevel)" || return 1
   local base="$(git branch --show-current)"
-  local worktree_root="${WT_ROOT:-${root:h}}"
+  local worktree_root="$WT_ROOT"
+  if [[ -z "$worktree_root" ]]; then
+    if [[ -d /worktrees ]]; then
+      worktree_root=/worktrees
+    else
+      worktree_root="${root:h}"
+    fi
+  fi
   local dir="${worktree_root}/${root:t}--${part}"
   local branch="${base}--${part}"
 
   mkdir -p "$worktree_root" || return 1
-  git worktree add -b "$branch" "$dir" "$base" || return 1
+  if git show-ref --verify --quiet "refs/heads/$branch"; then
+    git worktree add "$dir" "$branch" || return 1
+  else
+    git worktree add -b "$branch" "$dir" "$base" || return 1
+  fi
   echo "$root" >"$dir/.wt-parent"
 
   if [[ -f "$root/.env" ]]; then

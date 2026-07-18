@@ -26,6 +26,9 @@ class WorktreeHelpersTest(unittest.TestCase):
                 ["git", "-C", str(source), "commit", "--allow-empty", "-m", "initial"],
                 check=True,
             )
+            subprocess.run(
+                ["git", "-C", str(source), "branch", "develop--test-1"], check=True
+            )
 
             expected = worktrees / "source--test-1"
             result = subprocess.run(
@@ -56,6 +59,29 @@ class WorktreeHelpersTest(unittest.TestCase):
                 text=True,
             )
             self.assertEqual(branches.stdout.strip(), "develop")
+
+    def test_unconfigured_root_uses_worktrees_mount(self) -> None:
+        result = subprocess.run(
+            [
+                "zsh",
+                "-c",
+                'source "$1"; unset WT_ROOT; '
+                "git() { [[ \"$1 $2\" == 'rev-parse --show-toplevel' ]] && print /workspace && return; "
+                "[[ \"$1 $2\" == 'branch --show-current' ]] && print develop && return; "
+                "[[ \"$1 $2\" == 'show-ref --verify' ]] && return 1; "
+                "[[ \"$1 $2\" == 'worktree add' ]] && print -r -- \"$@\"; }; "
+                "mkdir() { :; }; unset TMUX; wt-new test-2",
+                "test",
+                str(FUNCTIONS),
+            ],
+            capture_output=True,
+            text=True,
+        )
+
+        self.assertIn(
+            "worktree add -b develop--test-2 /worktrees/workspace--test-2 develop",
+            result.stdout,
+        )
 
 
 if __name__ == "__main__":
