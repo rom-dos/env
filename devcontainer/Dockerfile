@@ -6,21 +6,23 @@
 # - NO firewall / network restrictions (internet enabled)
 # - tmux installed
 
-ARG UBUNTU_IMAGE=ubuntu:24.04@sha256:4fbb8e6a8395de5a7550b33509421a2bafbc0aab6c06ba2cef9ebffbc7092d90
+ARG UBUNTU_IMAGE
+ARG UV_IMAGE
+FROM ${UV_IMAGE} AS uv
 FROM ${UBUNTU_IMAGE}
 
 ARG TZ
 ARG TARGETARCH
-ARG NODE_VERSION=22.23.1
-ARG CLAUDE_CODE_VERSION=2.1.214
-ARG HUNKDIFF_VERSION=0.17.1
-ARG OPENCODE_VERSION=1.18.3
-ARG PNPM_VERSION=11.14.0
-ARG STARSHIP_VERSION=1.26.0
-ARG LAZYGIT_VERSION=0.63.1
-ARG NVIM_VERSION=v0.12.4
-ARG TPM_COMMIT=e261deb1b47614eed3400089ce7197dc68acc4eb
-ARG PYTHON_VERSION=3.14.6
+ARG NODE_VERSION
+ARG CLAUDE_CODE_VERSION
+ARG HUNKDIFF_VERSION
+ARG OPENCODE_VERSION
+ARG PNPM_VERSION
+ARG STARSHIP_VERSION
+ARG LAZYGIT_VERSION
+ARG NVIM_VERSION
+ARG TPM_COMMIT
+ARG PYTHON_VERSION
 ENV TZ="${TZ}" \
   LANG=C.UTF-8 \
   LC_ALL=C.UTF-8
@@ -203,20 +205,20 @@ ENV VISUAL=nvim
 
 # Install the shared application configurations.
 RUN mkdir -p /home/sbox/.config \
-  && curl -fsSL https://github.com/rom-dos/env/archive/refs/heads/master.tar.gz \
+  && curl -fsSL "https://github.com/rom-dos/env/archive/master.tar.gz" \
   | tar -xz --strip-components=3 -C /home/sbox/.config \
-  env-master/home/.config
+  "env-master/home/.config"
 
 # Install the shared shell and tmux configurations and the tmux plugin manager.
-RUN curl -fsSL https://raw.githubusercontent.com/rom-dos/env/master/home/.zprofile \
+RUN curl -fsSL "https://raw.githubusercontent.com/rom-dos/env/master/home/.zprofile" \
   -o /home/sbox/.zprofile \
-  && curl -fsSL https://raw.githubusercontent.com/rom-dos/env/master/home/.tmux.conf \
+  && curl -fsSL "https://raw.githubusercontent.com/rom-dos/env/master/home/.tmux.conf" \
   -o /home/sbox/.tmux.conf \
   && git clone --filter=blob:none https://github.com/tmux-plugins/tpm /home/sbox/.tmux/plugins/tpm \
   && git -C /home/sbox/.tmux/plugins/tpm checkout --detach "${TPM_COMMIT}"
 
 # Install the pinned uv release.
-COPY --from=ghcr.io/astral-sh/uv:0.11.29 /uv /bin/uv
+COPY --from=uv /uv /bin/uv
 
 # Ensure uv is on PATH for the sbox user.
 ENV PATH="/home/sbox/.local/bin:${PATH}"

@@ -13,7 +13,7 @@ usage:
   devc self-install      install devc + template into ~/.local
 
 notes:
-  - install and default run overwrite .devcontainer in the target repo
+  - install and default run fully replace .devcontainer in the target repo
   - rebuild keeps named volumes (history, auth) intact
   - if devcontainer cli is missing, we suggest how to install it
   - set DEVC_TEMPLATE_DIR to override the template source
@@ -56,32 +56,24 @@ copy_template() {
   local repo_path="$1"
   local src_dir="$2"
   local dest_dir="$repo_path/.devcontainer"
-
-  mkdir -p "$dest_dir"
+  local staging_dir
 
   for f in "${TEMPLATE_FILES[@]}"; do
     [[ -f "$src_dir/$f" ]] || die "missing template file: $src_dir/$f"
-    cp -f "$src_dir/$f" "$dest_dir/$f"
   done
 
-  local global_ignore=""
-  if command -v git >/dev/null 2>&1; then
-    global_ignore="$(git config --global --path core.excludesfile 2>/dev/null || true)"
-  fi
-
-  if [[ -z "$global_ignore" ]]; then
-    if [[ -n "${XDG_CONFIG_HOME:-}" && -f "$XDG_CONFIG_HOME/git/ignore" ]]; then
-      global_ignore="$XDG_CONFIG_HOME/git/ignore"
-    elif [[ -f "$HOME/.config/git/ignore" ]]; then
-      global_ignore="$HOME/.config/git/ignore"
-    elif [[ -f "$HOME/.gitignore_global" ]]; then
-      global_ignore="$HOME/.gitignore_global"
+  staging_dir="$(mktemp -d "$repo_path/.devcontainer.tmp.XXXXXX")"
+  chmod 755 "$staging_dir"
+  for f in "${TEMPLATE_FILES[@]}"; do
+    if ! cp -f "$src_dir/$f" "$staging_dir/$f"; then
+      rm -rf "$staging_dir"
+      return 1
     fi
-  fi
+  done
 
-  if [[ -n "$global_ignore" && -f "$global_ignore" ]]; then
-    cp -f "$global_ignore" "$dest_dir/.gitignore_global"
-    echo "  copied global gitignore from $global_ignore" >&2
+  if ! rm -rf "$dest_dir" || ! mv "$staging_dir" "$dest_dir"; then
+    rm -rf "$staging_dir"
+    return 1
   fi
 
   echo "✓ devcontainer installed to: $dest_dir" >&2

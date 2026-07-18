@@ -5,33 +5,22 @@
     "dockerfile": "Dockerfile",
     "args": {
       "TZ": "${localEnv:TZ:UTC}",
-      "CLAUDE_CODE_VERSION": "2.1.214"
-    }
-  },
-  "customizations": {
-    "vscode": {
-      "extensions": ["anthropic.claude-code", "openai.chatgpt"],
-      "settings": {
-        "editor.formatOnSave": true,
-        "editor.defaultFormatter": "esbenp.prettier-vscode",
-        "editor.codeActionsOnSave": {
-          "source.fixAll.eslint": "explicit"
-        },
-        "terminal.integrated.defaultProfile.linux": "zsh",
-        "terminal.integrated.profiles.linux": {
-          "bash": {
-            "path": "bash",
-            "icon": "terminal-bash"
-          },
-          "zsh": {
-            "path": "zsh"
-          }
-        }
-      }
+      "UBUNTU_IMAGE": "ubuntu:24.04@sha256:4fbb8e6a8395de5a7550b33509421a2bafbc0aab6c06ba2cef9ebffbc7092d90",
+      "NODE_VERSION": "22.23.1",
+      "CLAUDE_CODE_VERSION": "2.1.214",
+      "HUNKDIFF_VERSION": "0.17.1",
+      "OPENCODE_VERSION": "1.18.3",
+      "PNPM_VERSION": "11.14.0",
+      "STARSHIP_VERSION": "1.26.0",
+      "LAZYGIT_VERSION": "0.63.1",
+      "NVIM_VERSION": "v0.12.4",
+      "TPM_COMMIT": "e261deb1b47614eed3400089ce7197dc68acc4eb",
+      "UV_IMAGE": "ghcr.io/astral-sh/uv:0.11.29",
+      "PYTHON_VERSION": "3.14.6"
     }
   },
   "remoteUser": "sbox",
-  "postCreateCommand": "uv run --no-sync /workspace/.devcontainer/post_install.py",
+  "postCreateCommand": "uv run --no-project --python 3.14.6 /workspace/.devcontainer/post_install.py",
   "mounts": [
     "source=commandhistory,target=/commandhistory,type=volume",
     "source=claude-code-config,target=/home/sbox/.claude,type=volume",

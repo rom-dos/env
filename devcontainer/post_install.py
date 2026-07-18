@@ -5,7 +5,6 @@ import json
 import os
 import subprocess
 import sys
-import shutil
 from pathlib import Path
 
 ZSH_CONFIG = """\
@@ -47,17 +46,6 @@ def log(message: str) -> None:
     print(f"post-install: {message}", file=sys.stderr)
 
 
-def run_git(
-    args: list[str], cwd: Path, check: bool = False
-) -> subprocess.CompletedProcess[str]:
-    return subprocess.run(
-        ["git", "-C", str(cwd), *args],
-        check=check,
-        capture_output=True,
-        text=True,
-    )
-
-
 def run_sudo(args: list[str]) -> subprocess.CompletedProcess[str]:
     return subprocess.run(
         ["sudo", *args],
@@ -65,68 +53,6 @@ def run_sudo(args: list[str]) -> subprocess.CompletedProcess[str]:
         capture_output=True,
         text=True,
     )
-
-
-def resolve_workspace() -> Path:
-    env_workspace = os.environ.get("WORKSPACE_FOLDER")
-    if env_workspace:
-        workspace = Path(env_workspace)
-    else:
-        workspace = Path("/workspace")
-    if workspace.exists():
-        return workspace
-    return Path.cwd()
-
-
-def is_git_repo(cwd: Path) -> bool:
-    result = run_git(["rev-parse", "--is-inside-work-tree"], cwd)
-    return result.returncode == 0 and result.stdout.strip() == "true"
-
-
-def ensure_global_gitignore(workspace: Path) -> None:
-    result = run_git(["config", "--global", "--path", "core.excludesfile"], workspace)
-    if result.returncode != 0:
-        log("no global core.excludesfile configured")
-        return
-
-    raw_path = result.stdout.strip()
-    if not raw_path:
-        log("no global core.excludesfile configured")
-        return
-
-    excludes_path = Path(raw_path).expanduser()
-    if not excludes_path.is_absolute():
-        excludes_path = (Path.home() / excludes_path).resolve()
-
-    if excludes_path.exists():
-        log(f"global core.excludesfile exists at {excludes_path}")
-        return
-
-    source = workspace / ".devcontainer" / ".gitignore_global"
-    if not source.exists():
-        log(
-            f"global core.excludesfile missing at {excludes_path} and no template copy found"
-        )
-        return
-
-    excludes_path.parent.mkdir(parents=True, exist_ok=True)
-    shutil.copyfile(source, excludes_path)
-    log(f"copied gitignore to {excludes_path}")
-
-
-def ensure_codex_config() -> None:
-    codex_dir = Path(os.environ.get("CODEX_HOME", str(Path.home() / ".codex")))
-    codex_dir.mkdir(parents=True, exist_ok=True)
-    codex_config = codex_dir / "config.toml"
-    if codex_config.exists():
-        log(f"skipping codex config (already exists at {codex_config})")
-        return
-
-    codex_config.write_text(
-        'approval_policy = "never"\nsandbox_mode = "danger-full-access"\n',
-        encoding="utf-8",
-    )
-    log(f"wrote default codex config to {codex_config}")
 
 
 def ensure_claude_config() -> None:
@@ -190,17 +116,10 @@ def install_tmux_config() -> None:
 
 
 def main() -> None:
-    workspace = resolve_workspace()
-    if not is_git_repo(workspace):
-        log(f"skipping git repo checks (no repo at {workspace})")
-
     install_tmux_config()
     ensure_dir_ownership(Path("/commandhistory"))
     ensure_dir_ownership(Path.home() / ".claude")
-    ensure_dir_ownership(Path.home() / ".codex")
     ensure_dir_ownership(Path.home() / ".config" / "gh")
-    ensure_global_gitignore(workspace)
-    ensure_codex_config()
     ensure_claude_config()
     ensure_zsh_config()
     log("configured defaults for container use")
