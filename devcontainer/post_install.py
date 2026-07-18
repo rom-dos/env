@@ -123,9 +123,18 @@ def install_tmux_plugins() -> None:
     log("installed tmux plugins")
 
 
+def install_nvim_plugins() -> None:
+    subprocess.run(
+        ["nvim", "--headless", "+Lazy! sync", "+qa"],
+        check=True,
+    )
+    log("installed nvim plugins")
+
+
 def main() -> None:
     install_tmux_config()
     install_tmux_plugins()
+    install_nvim_plugins()
     ensure_dir_ownership(Path("/commandhistory"))
     ensure_dir_ownership(Path.home() / ".claude")
     ensure_dir_ownership(Path.home() / ".config" / "gh")
