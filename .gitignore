@@ -1,0 +1,5 @@
+home/.config/zsh/.zsh_sessions
+home/.config/zsh/.zsh_history
+home/.config/zsh/.zcompdump
+home/.config/zsh/.zcompdump*
+.devcontainer
