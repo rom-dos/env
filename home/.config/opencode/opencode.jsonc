@@ -1,0 +1,18 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "autoupdate": "notify",
+  "instructions": ["AGENTS.md"],
+  "mcp": {
+    "chrome-devtools": {
+      "type": "local",
+      "command": ["bun", "x", "chrome-devtools-mcp@latest"],
+      "enabled": false,
+    },
+  },
+  "share": "disabled",
+  "plugin": [
+    "@tarquinen/opencode-dcp@1.1.2",
+    "@mohak34/opencode-notifier@0.2.4",
+    "opencode-beads@0.3.2",
+  ],
+}
