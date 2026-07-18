@@ -68,5 +68,20 @@ class InstallNvimPluginsTest(unittest.TestCase):
         self.assertEqual(calls, ["tmux", "nvim"])
 
 
+class WorktreeStorageTest(unittest.TestCase):
+    def test_main_ensures_worktree_storage_is_writable(self) -> None:
+        with (
+            patch.object(post_install, "install_tmux_config"),
+            patch.object(post_install, "install_tmux_plugins"),
+            patch.object(post_install, "install_nvim_plugins"),
+            patch.object(post_install, "ensure_dir_ownership") as ensure_ownership,
+            patch.object(post_install, "ensure_claude_config"),
+            patch.object(post_install, "ensure_zsh_config"),
+        ):
+            post_install.main()
+
+        self.assertIn(((Path("/worktrees"),), {}), ensure_ownership.call_args_list)
+
+
 if __name__ == "__main__":
     unittest.main()

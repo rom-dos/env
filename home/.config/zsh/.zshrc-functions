@@ -9,9 +9,11 @@ wt-new() {
 
   local root="$(git rev-parse --show-toplevel)" || return 1
   local base="$(git branch --show-current)"
-  local dir="${root}--${part}"
+  local worktree_root="${WT_ROOT:-${root:h}}"
+  local dir="${worktree_root}/${root:t}--${part}"
   local branch="${base}--${part}"
 
+  mkdir -p "$worktree_root" || return 1
   git worktree add -b "$branch" "$dir" "$base" || return 1
   echo "$root" >"$dir/.wt-parent"
 
@@ -22,7 +24,7 @@ wt-new() {
     # parallel across worktrees.
     local dev_ports=(${=DEV_PORTS})
     local used_ports=() f p
-    for f in "${root}"--*/.env.local; do
+    for f in "${worktree_root}/${root:t}"--*/.env.local; do
       p="$(grep -m1 '^PORT=' "$f" | cut -d= -f2)"
       [[ -n "$p" ]] && used_ports+=("$p")
     done

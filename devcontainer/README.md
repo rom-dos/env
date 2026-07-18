@@ -22,3 +22,4 @@ you're now in tmux with claude and opencode ready to go, with permissions precon
 - **deletes and fully replaces `.devcontainer/`** on every run
 - default shell is zsh
 - auth and history use shared, global docker volumes; they persist across rebuilds and are shared by every project using this template
+- `wt-new` worktrees live in a project-specific `/worktrees` volume; their commits remain in `/workspace/.git`, so `wt-merge` and `wt-done` work normally

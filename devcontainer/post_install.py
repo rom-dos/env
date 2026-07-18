@@ -136,6 +136,7 @@ def main() -> None:
     install_tmux_plugins()
     install_nvim_plugins()
     ensure_dir_ownership(Path("/commandhistory"))
+    ensure_dir_ownership(Path("/worktrees"))
     ensure_dir_ownership(Path.home() / ".claude")
     ensure_dir_ownership(Path.home() / ".config" / "gh")
     ensure_claude_config()
