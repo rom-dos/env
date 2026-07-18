@@ -36,8 +36,6 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
 
     source $NAVI/navi-scripts/functions.sh
   fi
-
-  source $(brew --prefix)/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh # Should be last
 fi
 
 export BUN_INSTALL="$HOME/.bun"
@@ -69,3 +67,10 @@ alias help=run-help
 
 eval "$(starship init zsh)"
 eval "$(luarocks path --bin)"
+
+# Syntax highlighting must be loaded after other shell integrations.
+if [[ "$OSTYPE" == "darwin"* ]]; then
+  source "$(brew --prefix)/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
+elif [[ -r /usr/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh ]]; then
+  source /usr/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+fi
