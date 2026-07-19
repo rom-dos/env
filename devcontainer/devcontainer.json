@@ -1,6 +1,7 @@
 {
   "name": "Agents Sandbox",
   "init": true,
+  "runArgs": ["--publish", "8080-8085:8080-8085"],
   "build": {
     "dockerfile": "Dockerfile",
     "args": {
