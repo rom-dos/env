@@ -22,6 +22,7 @@
   },
   "remoteUser": "sbox",
   "postCreateCommand": "uv run --no-project --python 3.14.6 /workspace/.devcontainer/post_install.py",
+  "postStartCommand": "pgrep -x redis-server >/dev/null || redis-server --daemonize yes --dir /tmp",
   "mounts": [
     "source=commandhistory,target=/commandhistory,type=volume",
     "source=claude-code-config,target=/home/sbox/.claude,type=volume",

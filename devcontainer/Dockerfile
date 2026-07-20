@@ -52,6 +52,7 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
   git-delta \
   fzf \
   ripgrep \
+  redis-server \
   zoxide \
   fd-find \
   && rm -rf /var/lib/apt/lists/*
