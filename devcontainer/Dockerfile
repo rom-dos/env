@@ -60,6 +60,35 @@ RUN if command -v fdfind >/dev/null 2>&1 && [ ! -e /usr/local/bin/fd ]; then \
   ln -s /usr/bin/fdfind /usr/local/bin/fd; \
   fi
 
+# There's no X server in this container, so a real xclip/xsel/wl-clipboard
+# would have nothing to talk to. Instead, ship a shim named `xclip` (what
+# lazygit and friends look for) that bridges clipboard writes to the host
+# via the OSC 52 terminal escape sequence. tmux's `allow-passthrough on`
+# forwards it to the outer terminal; WezTerm/Kitty/Ghostty/iTerm2 all honor
+# OSC 52 clipboard writes natively.
+RUN cat >/usr/local/bin/xclip <<'EOF'
+#!/bin/sh
+set -eu
+
+for arg in "$@"; do
+  case "$arg" in
+    -o|-out)
+      echo "xclip (osc52 shim): reading the clipboard is not supported" >&2
+      exit 1
+      ;;
+  esac
+done
+
+data=$(cat | base64 | tr -d '\n')
+
+if [ -n "${TMUX:-}" ]; then
+  printf '\033Ptmux;\033\033]52;c;%s\a\033\\' "$data" > /dev/tty
+else
+  printf '\033]52;c;%s\a' "$data" > /dev/tty
+fi
+EOF
+RUN chmod +x /usr/local/bin/xclip
+
 # Install the official Node distribution directly into the runtime base.
 RUN case "${TARGETARCH}" in \
   amd64) node_arch=x64; node_sha=9749e988f437343b7fa832c69ded82a312e41a03116d766797ac14f6f9eee578 ;; \
