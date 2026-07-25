@@ -10,6 +10,9 @@ class RootInstallTest(unittest.TestCase):
         self.install_script = Path(__file__).with_name("install.sh").resolve()
         self.nvim_source_dir = self.install_script.parent / "home/.config/nvim"
         self.ghostty_source_dir = self.install_script.parent / "home/.config/ghostty"
+        self.starship_source_file = (
+            self.install_script.parent / "home/.config/starship.toml"
+        )
 
     def test_installs_when_invoked_outside_repository(self) -> None:
         with tempfile.TemporaryDirectory() as temp_dir:
@@ -33,6 +36,10 @@ class RootInstallTest(unittest.TestCase):
             )
             self.assertEqual(
                 (home / ".config/ghostty").resolve(), self.ghostty_source_dir
+            )
+            self.assertEqual(
+                (home / ".config/starship.toml").resolve(),
+                self.starship_source_file,
             )
 
     def test_rerun_keeps_existing_link_without_creating_backup(self) -> None:
@@ -58,8 +65,13 @@ class RootInstallTest(unittest.TestCase):
             self.assertEqual(
                 (home / ".config/ghostty").resolve(), self.ghostty_source_dir
             )
+            self.assertEqual(
+                (home / ".config/starship.toml").resolve(),
+                self.starship_source_file,
+            )
             self.assertFalse((home / ".config/nvim.bk").exists())
             self.assertFalse((home / ".config/ghostty.bk").exists())
+            self.assertFalse((home / ".config/starship.toml.bk").exists())
 
 
 if __name__ == "__main__":

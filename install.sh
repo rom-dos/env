@@ -10,7 +10,7 @@ link_config() {
   local backup_dir="$target_dir.bk"
   local backup_created=false
 
-  if [[ ! -d "$source_dir" ]]; then
+  if [[ ! -e "$source_dir" ]]; then
     echo "error: $name config not found at $source_dir" >&2
     return 1
   fi
@@ -42,3 +42,4 @@ mkdir -p "$HOME/.config"
 
 link_config nvim
 link_config ghostty
+link_config starship.toml
