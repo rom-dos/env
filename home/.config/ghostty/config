@@ -1,0 +1,6 @@
+theme = carbonfox
+window-decoration = false
+font-feature = -calt
+font-feature = -dlig
+keybind = global:ctrl+grave_accent=toggle_quick_terminal
+quick-terminal-position = top
