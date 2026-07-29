@@ -23,6 +23,7 @@ ARG LAZYGIT_VERSION
 ARG NVIM_VERSION
 ARG TPM_COMMIT
 ARG PYTHON_VERSION
+ARG PLANNOTATOR_VERSION
 ENV TZ="${TZ}" \
   LANG=C.UTF-8 \
   LC_ALL=C.UTF-8
@@ -55,6 +56,7 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
   redis-server \
   zoxide \
   fd-find \
+  python3 \
   && rm -rf /var/lib/apt/lists/*
 RUN if command -v fdfind >/dev/null 2>&1 && [ ! -e /usr/local/bin/fd ]; then \
   ln -s /usr/bin/fdfind /usr/local/bin/fd; \
@@ -258,6 +260,11 @@ ENV PATH="/home/sbox/.local/bin:${PATH}"
 
 # Preinstall managed Python for uv.
 RUN uv python install "${PYTHON_VERSION}"
+
+# Install the pinned plannotator release.
+RUN curl -fsSL https://plannotator.ai/install.sh \
+  | bash -s -- --version "v${PLANNOTATOR_VERSION}" --non-interactive \
+  && plannotator --version
 
 # Passwordless sudo for the non-root user (for unattended / automation workflows).
 USER root
