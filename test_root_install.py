@@ -13,6 +13,8 @@ class RootInstallTest(unittest.TestCase):
         self.starship_source_file = (
             self.install_script.parent / "home/.config/starship.toml"
         )
+        self.zsh_source_dir = self.install_script.parent / "home/.config/zsh"
+        self.zprofile_source_file = self.install_script.parent / "home/.zprofile"
 
     def test_installs_when_invoked_outside_repository(self) -> None:
         with tempfile.TemporaryDirectory() as temp_dir:
@@ -40,6 +42,10 @@ class RootInstallTest(unittest.TestCase):
             self.assertEqual(
                 (home / ".config/starship.toml").resolve(),
                 self.starship_source_file,
+            )
+            self.assertEqual((home / ".config/zsh").resolve(), self.zsh_source_dir)
+            self.assertEqual(
+                (home / ".zprofile").resolve(), self.zprofile_source_file
             )
 
     def test_rerun_keeps_existing_link_without_creating_backup(self) -> None:
@@ -69,9 +75,15 @@ class RootInstallTest(unittest.TestCase):
                 (home / ".config/starship.toml").resolve(),
                 self.starship_source_file,
             )
+            self.assertEqual((home / ".config/zsh").resolve(), self.zsh_source_dir)
+            self.assertEqual(
+                (home / ".zprofile").resolve(), self.zprofile_source_file
+            )
             self.assertFalse((home / ".config/nvim.bk").exists())
             self.assertFalse((home / ".config/ghostty.bk").exists())
             self.assertFalse((home / ".config/starship.toml.bk").exists())
+            self.assertFalse((home / ".config/zsh.bk").exists())
+            self.assertFalse((home / ".zprofile.bk").exists())
 
 
 if __name__ == "__main__":

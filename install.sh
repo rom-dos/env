@@ -4,9 +4,10 @@ set -euo pipefail
 script_dir="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
 
 link_config() {
-  local name="$1"
-  local source_dir="$script_dir/home/.config/$name"
-  local target_dir="$HOME/.config/$name"
+  local relative_path="$1"
+  local name="${relative_path##*/}"
+  local source_dir="$script_dir/home/$relative_path"
+  local target_dir="$HOME/$relative_path"
   local backup_dir="$target_dir.bk"
   local backup_created=false
 
@@ -14,6 +15,8 @@ link_config() {
     echo "error: $name config not found at $source_dir" >&2
     return 1
   fi
+
+  mkdir -p "$(dirname -- "$target_dir")"
 
   if [[ -L "$target_dir" && "$target_dir" -ef "$source_dir" ]]; then
     echo "$name config already linked to $target_dir"
@@ -38,8 +41,8 @@ link_config() {
   fi
 }
 
-mkdir -p "$HOME/.config"
-
-link_config nvim
-link_config ghostty
-link_config starship.toml
+link_config .config/nvim
+link_config .config/ghostty
+link_config .config/starship.toml
+link_config .config/zsh
+link_config .zprofile
