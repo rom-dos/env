@@ -47,7 +47,6 @@ export BUN_INSTALL="$HOME/.bun"
 export PATH="$HOME/.opencode/bin:$BUN_INSTALL/bin:$HOME/.cargo/bin:$HOME/.local/bin:$PATH"
 
 export NPM_TOKEN=$_NPM_TOKEN
-export GITHUB_TOKEN=$_GITHUB_TOKEN
 export GITHUB_USER_NAME="$_GITHUB_USER_NAME"
 
 export N_PRESERVE_NPM=1
