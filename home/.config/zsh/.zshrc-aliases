@@ -15,7 +15,6 @@ alias mk="mkdir -p"
 alias size="du -h | fzf"
 
 # programs
-alias f="nnn -ca -H -d"
 alias mu="ncmpcpp"
 alias z="zoxide"
 alias lg="lazygit"
