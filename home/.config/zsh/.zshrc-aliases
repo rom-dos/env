@@ -25,8 +25,9 @@ alias ocu="opencode upgrade"
 alias ocp="opencode --port"
 
 # hunk
-alias hd="hunk diff --theme vesper"
-alias hs="hunk show --theme vesper"
+alias hd="hunk diff"
+alias hds="hunk diff --staged"
+alias hs="hunk show"
 
 # tmux
 alias attach="tmux attach -t"
