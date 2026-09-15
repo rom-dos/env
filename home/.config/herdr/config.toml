@@ -1,0 +1,40 @@
+onboarding = false
+
+[ui.toast]
+delivery = "terminal"
+
+[experimental]
+kitty_graphics = true
+
+[ui]
+status_indicators = "symbols"
+
+[keys]
+previous_workspace = "prefix+shift+h"
+next_workspace = "prefix+shift+l"
+
+[[keys.command]]
+key = "prefix+t"
+type = "plugin_action"
+command = "herdr-theme-picker.open"
+
+[theme.custom]
+panel_bg = "#1f1f1f"
+sidebar_bg = "#1a1a1a"
+active_row_bg = "#2c2c30"
+selection_bg = "#4d4d4d"
+surface0 = "#2c2c30"
+surface1 = "#a5a59c"
+surface_dim = "#1c1c1c"
+overlay0 = "#a5a59c"
+overlay1 = "#afa79d"
+text = "#c6c0b9"
+subtext0 = "#afa79d"
+accent = "#6c7f93"
+mauve = "#b894af"
+green = "#778c73"
+yellow = "#cc9166"
+red = "#a97070"
+blue = "#6c7f93"
+teal = "#8ea4a2"
+peach = "#bc8f8f"

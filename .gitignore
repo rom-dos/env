@@ -2,6 +2,11 @@ home/.config/zsh/.zsh_sessions
 home/.config/zsh/.zsh_history
 home/.config/zsh/.zcompdump
 home/.config/zsh/.zcompdump*
+home/.config/herdr/plugins/github
+home/.config/herdr/config.toml.bak*
+home/.config/herdr/herdr-client.log
+home/.config/herdr/herdr-server.log
+home/.config/herdr/session.json
 .devcontainer
 .wt-parent
 .wt-tmux-window
