@@ -46,4 +46,5 @@ link_config .config/ghostty
 link_config .config/starship.toml
 link_config .config/zsh
 link_config .config/herdr
+link_config .config/yazi
 link_config .zprofile
