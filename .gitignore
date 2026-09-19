@@ -7,6 +7,7 @@ home/.config/herdr/config.toml.bak*
 home/.config/herdr/herdr-client.log
 home/.config/herdr/herdr-server.log
 home/.config/herdr/session.json
+home/.config/herdr/release-notes.json
 .devcontainer
 .wt-parent
 .wt-tmux-window
