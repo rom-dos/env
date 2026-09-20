@@ -45,7 +45,6 @@ alias gl1="git log --oneline"
 alias gp="git pull"
 alias gs="git status"
 alias gd="git diff"
-alias gcm="git commit"
 alias grb2="git rebase -i HEAD~2"
 alias fgc='git checkout $(git branch | fzf)'
 alias fgm='git merge $(git branch | fzf)'

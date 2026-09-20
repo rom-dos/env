@@ -47,4 +47,5 @@ link_config .config/starship.toml
 link_config .config/zsh
 link_config .config/herdr
 link_config .config/yazi
+link_config .local/bin
 link_config .zprofile

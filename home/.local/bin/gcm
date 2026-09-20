@@ -1,0 +1,36 @@
+#!/usr/bin/env bash
+
+# Create a Conventional Commit message, using the branch's ticket ID as scope.
+
+if ! command -v fzf >/dev/null 2>&1; then
+  printf 'gcm: error: fzf is not installed or not available in PATH\n' >&2
+  exit 127
+fi
+
+commit_type=$(
+  printf '%s\n' \
+    feat \
+    fix \
+    build \
+    chore \
+    ci \
+    docs \
+    style \
+    refactor \
+    perf \
+    test |
+    fzf --prompt='Commit type: ' --height=~15 --layout=reverse --border
+) || exit $?
+
+# Do nothing if the picker was closed without making a selection.
+[[ -n $commit_type ]] || exit 1
+
+branch=$(git symbolic-ref --quiet --short HEAD 2>/dev/null || true)
+scope=0
+
+# Match branches such as feature/nm/ASD-123-new-feature.
+if [[ $branch =~ ^[^/]+/[^/]+/([[:upper:]][[:upper:][:digit:]]*-[[:digit:]]+)(-|$) ]]; then
+  scope=${BASH_REMATCH[1]}
+fi
+
+exec git commit --edit --message "${commit_type}(${scope}): "
