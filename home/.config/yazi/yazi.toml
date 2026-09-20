@@ -1,2 +1,25 @@
 [mgr]
 show_hidden = true
+
+[opener]
+zathura = [
+  { run = 'zathura "$@"', orphan = true, for = "macos" },
+]
+
+poppler = [
+  { run = 'poppler "$@"', orphan = true, for = "macos" },
+]
+
+mpv = [
+  { run = 'mpv "$@"', block = true, for = "macos" },
+]
+
+bookokrat = [
+  { run = 'bookokrat "$@"', block = true, for = "macos" },
+]
+
+[open]
+prepend_rules = [
+  { url = "*.epub", use = "bookokrat" },
+  { url = "*.wav",  use = "mpv" },
+]
