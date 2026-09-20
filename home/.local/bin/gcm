@@ -2,28 +2,38 @@
 
 # Create a Conventional Commit message, using the branch's ticket ID as scope.
 
-if ! command -v fzf >/dev/null 2>&1; then
-  printf 'gcm: error: fzf is not installed or not available in PATH\n' >&2
-  exit 127
+commit_types=(feat fix build chore ci docs style refactor perf test)
+
+if (( $# > 1 )); then
+  printf 'Usage: gcm [commit-type]\n' >&2
+  exit 2
 fi
 
-commit_type=$(
-  printf '%s\n' \
-    feat \
-    fix \
-    build \
-    chore \
-    ci \
-    docs \
-    style \
-    refactor \
-    perf \
-    test |
-    fzf --prompt='Commit type: ' --height=~15 --layout=reverse --border
-) || exit $?
+if (( $# == 1 )); then
+  commit_type=$1
+  valid_type=false
+  for type in "${commit_types[@]}"; do
+    if [[ $commit_type == "$type" ]]; then
+      valid_type=true
+      break
+    fi
+  done
 
-# Do nothing if the picker was closed without making a selection.
-[[ -n $commit_type ]] || exit 1
+  if [[ $valid_type != true ]]; then
+    printf 'gcm: error: invalid commit type: %s\n' "$commit_type" >&2
+    exit 2
+  fi
+else
+  if ! command -v fzf >/dev/null 2>&1; then
+    printf 'gcm: error: fzf is not installed or not available in PATH\n' >&2
+    exit 127
+  fi
+
+  commit_type=$(printf '%s\n' "${commit_types[@]}" | fzf --prompt='Commit type: ' --height=~15 --layout=reverse --border) || exit $?
+
+  # Do nothing if the picker was closed without making a selection.
+  [[ -n $commit_type ]] || exit 1
+fi
 
 branch=$(git symbolic-ref --quiet --short HEAD 2>/dev/null || true)
 scope=0

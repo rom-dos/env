@@ -188,3 +188,7 @@ end, { desc = "Send file:line ref to Claude (tmux)" })
 vim.keymap.set("x", "<leader>cY", function()
   claude_send(math.min(vim.fn.line("v"), vim.fn.line(".")), math.max(vim.fn.line("v"), vim.fn.line(".")))
 end, { desc = "Send file:line-range ref to Claude (tmux)" })
+
+-- Conventional commit picker and editor within this Neovim instance.
+vim.api.nvim_create_user_command("Gcm", require("config.gcm").commit, {})
+vim.keymap.set("n", "<leader>gc", "<cmd>Gcm<cr>", { desc = "Create conventional commit" })
