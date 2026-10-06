@@ -4,6 +4,7 @@ home/.config/zsh/.zcompcache
 home/.config/zsh/.zcompdump
 home/.config/zsh/.zcompdump*
 home/.config/herdr/plugins/github
+home/.config/herdr/plugins.json
 home/.config/herdr/config.toml.bak*
 home/.config/herdr/herdr-client.log
 home/.config/herdr/herdr-server.log
