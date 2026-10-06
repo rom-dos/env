@@ -19,8 +19,13 @@ home/.claude/file-history
 home/.claude/plugins
 home/.claude/projects
 
-home/.local/bin/herdr
+home/.local/bin/claude
 home/.local/bin/devc
+home/.local/bin/greyproxy
+home/.local/bin/herdr
+home/.local/bin/npmt
+home/.local/bin/plannotator
+home/.local/bin/terminal-browser
 
 .devcontainer
 
