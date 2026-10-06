@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+# git-fd: fuzzy-delete a local git branch using fzf.
+# Usage: git fd
+# If the branch isn't fully merged, asks for confirmation before force-deleting.
+set -euo pipefail
+
+git rev-parse --git-dir >/dev/null 2>&1 || { echo "git-fd: not a git repository" >&2; exit 1; }
+
+# Exclude the current branch (marked with "*") since it can't be deleted.
+branch=$(git branch | grep -v '^\*' | sed 's/^[ +]*//' | fzf --prompt="delete branch> " --height=40% --reverse) || exit 0
+[[ -z "$branch" ]] && exit 0
+
+if err=$(git branch -d "$branch" 2>&1); then
+  echo "$err"
+elif [[ "$err" == *"not fully merged"* ]]; then
+  read -r -p "Branch '$branch' is not fully merged. Force delete? [y/N] " answer </dev/tty
+  if [[ "$answer" =~ ^[Yy]$ ]]; then
+    git branch -D "$branch"
+  else
+    echo "Aborted."
+  fi
+else
+  echo "$err" >&2
+  exit 1
+fi

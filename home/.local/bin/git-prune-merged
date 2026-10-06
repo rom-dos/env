@@ -1,0 +1,94 @@
+#!/usr/bin/env bash
+# Delete local branches that are already merged into master (local or origin/master).
+# Detects regular merges, fast-forwards, squash merges and rebase merges.
+#
+# Usage: git-prune-merged [-n|--dry-run] [-y|--yes]
+#   -n, --dry-run   list what would be deleted, delete nothing
+#   -y, --yes       delete without asking for confirmation
+set -euo pipefail
+
+base=master
+dry_run=false
+assume_yes=false
+
+for arg in "$@"; do
+  case "$arg" in
+    -n|--dry-run) dry_run=true ;;
+    -y|--yes) assume_yes=true ;;
+    -h|--help) sed -n '2,8p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
+    *) echo "Unknown option: $arg (see --help)" >&2; exit 1 ;;
+  esac
+done
+
+git rev-parse --git-dir >/dev/null 2>&1 || { echo "Not inside a git repository." >&2; exit 1; }
+
+if git remote get-url origin >/dev/null 2>&1; then
+  echo "Fetching origin..."
+  git fetch --quiet --prune origin || echo "Warning: fetch failed, using cached origin refs." >&2
+fi
+
+# Compare against whichever of master / origin/master exist.
+targets=()
+git show-ref --verify --quiet "refs/heads/$base" && targets+=("refs/heads/$base")
+git show-ref --verify --quiet "refs/remotes/origin/$base" && targets+=("refs/remotes/origin/$base")
+if [ ${#targets[@]} -eq 0 ]; then
+  echo "Neither '$base' nor 'origin/$base' exists in this repo." >&2
+  exit 1
+fi
+
+current=$(git symbolic-ref --quiet --short HEAD || true)
+# Branches checked out in any worktree can't be deleted.
+checked_out=$(git worktree list --porcelain | sed -n 's|^branch refs/heads/||p')
+
+is_merged() {
+  local ref="refs/heads/$1" target mb tmp
+  for target in "${targets[@]}"; do
+    # Regular merge or fast-forward: branch tip is reachable from target.
+    git merge-base --is-ancestor "$ref" "$target" && return 0
+
+    # Rebase merge: every commit on the branch has an equivalent patch in target.
+    ! git cherry "$target" "$ref" | grep -q '^+' && return 0
+
+    # Squash merge: collapse the branch into one commit on top of the merge-base
+    # and check whether an equivalent patch landed in target.
+    mb=$(git merge-base "$target" "$ref") || continue
+    tmp=$(git commit-tree "$ref^{tree}" -p "$mb" -m squash-check)
+    [[ $(git cherry "$target" "$tmp") == -* ]] && return 0
+  done
+  return 1
+}
+
+merged=()
+while IFS= read -r branch; do
+  [[ $branch == "$base" ]] && continue
+  if [[ $branch == "$current" ]]; then
+    is_merged "$branch" && echo "Skipping '$branch': merged, but it's your current branch."
+    continue
+  fi
+  if grep -qxF -- "$branch" <<<"$checked_out"; then
+    is_merged "$branch" && echo "Skipping '$branch': merged, but checked out in another worktree."
+    continue
+  fi
+  if is_merged "$branch"; then merged+=("$branch"); fi
+done < <(git for-each-ref --format='%(refname:lstrip=2)' refs/heads/)
+
+if [ ${#merged[@]} -eq 0 ]; then
+  echo "No merged local branches to delete."
+  exit 0
+fi
+
+echo "Local branches merged into ${targets[*]#refs/*/}:"
+printf '  %s\n' "${merged[@]}"
+
+$dry_run && { echo "(dry run, nothing deleted)"; exit 0; }
+
+if ! $assume_yes; then
+  read -r -p "Delete these ${#merged[@]} branches? [y/N] " answer
+  [[ $answer =~ ^[Yy]$ ]] || { echo "Aborted."; exit 0; }
+fi
+
+for branch in "${merged[@]}"; do
+  # -D is needed because git doesn't recognise squash merges as merged.
+  # git prints the old SHA, so a branch can be restored with: git branch <name> <sha>
+  git branch -D -- "$branch"
+done
