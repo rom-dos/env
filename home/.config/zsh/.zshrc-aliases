@@ -9,6 +9,8 @@ alias sz="source ~/.config/zsh/.zshrc && echo '.zshrc updated.'"
 alias hist='eval $(history | fzf | sed "s/^[ ]*[0-9]*[ ]*//")'
 alias h.="hist"
 
+alias cl="claude"
+
 alias af="alias | fzf"
 alias help="run-help"
 alias mk="mkdir -p"
