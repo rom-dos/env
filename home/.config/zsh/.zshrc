@@ -71,6 +71,40 @@ alias help=run-help
 eval "$(starship init zsh)"
 eval "$(luarocks path --bin)"
 
+# Notify via herdr when a long-running command finishes (Ghostty can't see commands inside herdr)
+if [[ -n "$HERDR_ENV" ]]; then
+  autoload -Uz add-zsh-hook
+  NOTIFY_THRESHOLD=5
+  NOTIFY_IGNORE=(nvim vim vi less man top htop btop ssh claude codex opencode herdr lazygit tig fzf f)
+
+  _notify_preexec() {
+    _notify_cmd_start=$SECONDS
+    _notify_cmd_name=$1
+  }
+
+  _notify_precmd() {
+    local exit=$?
+    [[ -n "$_notify_cmd_start" ]] || return
+    local elapsed=$(( SECONDS - _notify_cmd_start ))
+    unset _notify_cmd_start
+    (( elapsed >= NOTIFY_THRESHOLD )) || return
+    (( ${NOTIFY_IGNORE[(Ie)${${(z)_notify_cmd_name}[1]}]} )) && return
+    local title
+    (( exit == 0 )) && title="✅ Done" || title="❌ Failed ($exit)"
+    herdr notification show "$title" --body "$_notify_cmd_name (${elapsed}s)" \
+      --sound $([[ $exit -eq 0 ]] && echo done || echo request) >/dev/null 2>&1 &!
+  }
+
+  add-zsh-hook preexec _notify_preexec
+  add-zsh-hook precmd _notify_precmd
+fi
+
+export FZF_DEFAULT_OPTS="$FZF_DEFAULT_OPTS \
+  --bind 'alt-g:first,alt-G:last' \
+  --bind 'ctrl-d:half-page-down,ctrl-u:half-page-up' \
+  --bind 'ctrl-a:select-all,ctrl-x:deselect-all' \
+  --bind 'ctrl-/:toggle-preview'"
+
 # Syntax highlighting must be loaded after other shell integrations.
 if [[ "$OSTYPE" == "darwin"* ]]; then
   source "$(brew --prefix)/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
