@@ -335,5 +335,9 @@
   "Unfortunately, it's ...": {
     "prefix": ["unfortunately"],
     "body": ["Unfortunately, it's not ${1:working}."]
+  },
+  "to-do": {
+    "prefix": ["todo"],
+    "body": "- [ ] "
   }
 }
