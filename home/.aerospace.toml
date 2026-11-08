@@ -80,6 +80,14 @@ gaps.outer.bottom =     [{ monitor.main = 88 }, { monitor."built-in" = 16 }, 16]
 gaps.outer.top =        [{ monitor.main = 88 }, { monitor."built-in" = 56 }, 56]
 gaps.outer.right =      [{ monitor.main = 196 }, { monitor."built-in" = 24 }, 24]
 
+# Laptop Display
+# gaps.inner.horizontal = 8
+# gaps.inner.vertical =   24
+# gaps.outer.left =       16
+# gaps.outer.bottom =     32
+# gaps.outer.top =        64
+# gaps.outer.right =      24
+
 # 'main' binding mode declaration
 # See: https://nikitabobko.github.io/AeroSpace/guide#binding-modes
 # 'main' binding mode must be always presented
