@@ -27,3 +27,5 @@ export BAT_THEME_DARK="base16-256"
 export MANPAGER="sh -c 'col -bx | bat --theme-dark=base16-256 -l man -p'"
 
 export OPENCODE_EXPERIMENTAL_PLAN_MODE=1
+
+export PLANNOTATOR_PORT=63192
