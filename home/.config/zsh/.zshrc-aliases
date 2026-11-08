@@ -29,7 +29,8 @@ alias ocp="opencode --port"
 # hunk
 alias hd="hunk diff"
 alias hds="hunk diff --staged"
-alias hs="hunk show"
+alias hs="hunk status"
+alias hgh="hunk gh"
 
 # tmux
 alias attach="tmux attach -t"
@@ -42,7 +43,8 @@ alias v.='nvim $(fzf)'
 alias g="git"
 alias gb="git branch"
 alias gc="git checkout"
-alias gl="git log"
+#alias gl="git log"
+alias gl="hunk log"
 alias gl1="git log --oneline"
 alias gp="git pull"
 alias gs="git status"
