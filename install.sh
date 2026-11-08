@@ -50,3 +50,4 @@ link_config .config/yazi
 link_config .local/bin
 link_config .zprofile
 link_config .aerospace.toml
+link_config .claude

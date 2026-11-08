@@ -17,8 +17,25 @@ home/.claude/chrome
 home/.claude/daemon
 home/.claude/downloads
 home/.claude/file-history
+home/.claude/paste-cache
 home/.claude/plugins
 home/.claude/projects
+home/.claude/session-env
+home/.claude/sessions
+home/.claude/shell-snapshots
+home/.claude/skills
+home/.claude/state
+home/.claude/telemetry
+home/.claude/.current-session
+home/.claude/.last-cleanup
+home/.claude/.last-update-result.json
+home/.claude/daemon-auth-cooldown
+home/.claude/daemon-auth-status.json
+home/.claude/history.jsonl
+home/.claude/mcp-needs-auth-cache.json
+home/.claude/policy-limits.json*
+home/.claude/remote-settings.json*
+home/.claude/stats-cache.json
 
 home/.local/bin/claude
 home/.local/bin/devc
