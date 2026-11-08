@@ -37,6 +37,8 @@ home/.claude/policy-limits.json*
 home/.claude/remote-settings.json*
 home/.claude/stats-cache.json
 
+home/.agents/skills/synced
+
 home/.local/bin/claude
 home/.local/bin/devc
 home/.local/bin/greyproxy

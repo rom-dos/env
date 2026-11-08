@@ -5,9 +5,10 @@ script_dir="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
 
 link_config() {
   local relative_path="$1"
+  local target_path="${2:-$relative_path}"
   local name="${relative_path##*/}"
   local source_dir="$script_dir/home/$relative_path"
-  local target_dir="$HOME/$relative_path"
+  local target_dir="$HOME/$target_path"
   local backup_dir="$target_dir.bk"
   local backup_created=false
 
@@ -51,3 +52,5 @@ link_config .local/bin
 link_config .zprofile
 link_config .aerospace.toml
 link_config .claude
+link_config .agents
+link_config .agents/skills .claude/skills
