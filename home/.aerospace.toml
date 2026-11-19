@@ -138,8 +138,8 @@ gaps.outer.right =      [{ monitor.main = 196 }, { monitor."built-in" = 24 }, 24
     ctrl-alt-up = 'resize smart +50'
 
     # See: https://nikitabobko.github.io/AeroSpace/commands#workspace
-    alt-left = 'workspace prev'
-    alt-right = 'workspace next'
+    alt-cmd-left = 'workspace prev'
+    alt-cmd-right = 'workspace next'
     alt-m = 'workspace 1'
     alt-2 = 'workspace 2'
     alt-3 = 'workspace 3'
