@@ -44,6 +44,7 @@ link_config() {
 
 link_config .config/nvim
 link_config .config/ghostty
+link_config .config/rex
 link_config .config/starship.toml
 link_config .config/zsh
 link_config .config/herdr

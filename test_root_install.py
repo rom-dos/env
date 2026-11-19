@@ -13,6 +13,7 @@ class RootInstallTest(unittest.TestCase):
         self.starship_source_file = (
             self.install_script.parent / "home/.config/starship.toml"
         )
+        self.rex_source_dir = self.install_script.parent / "home/.config/rex"
         self.zsh_source_dir = self.install_script.parent / "home/.config/zsh"
         self.zprofile_source_file = self.install_script.parent / "home/.zprofile"
 
@@ -47,6 +48,33 @@ class RootInstallTest(unittest.TestCase):
             self.assertEqual(
                 (home / ".zprofile").resolve(), self.zprofile_source_file
             )
+            self.assertTrue((home / ".config/rex").is_symlink())
+            self.assertEqual((home / ".config/rex").resolve(), self.rex_source_dir)
+            self.assertTrue((home / ".config/rex/init.lua").is_file())
+
+    def test_backs_up_existing_rex_config(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            home = Path(temp_dir)
+            rex_config = home / ".config/rex"
+            rex_config.mkdir(parents=True)
+            (rex_config / "init.lua").write_text("-- existing config\n")
+            env = os.environ.copy()
+            env["HOME"] = str(home)
+
+            subprocess.run(
+                ["bash", str(self.install_script)],
+                check=True,
+                env=env,
+                capture_output=True,
+                text=True,
+            )
+
+            self.assertTrue(rex_config.is_symlink())
+            self.assertEqual(rex_config.resolve(), self.rex_source_dir)
+            self.assertEqual(
+                (home / ".config/rex.bk/init.lua").read_text(),
+                "-- existing config\n",
+            )
 
     def test_rerun_keeps_existing_link_without_creating_backup(self) -> None:
         with tempfile.TemporaryDirectory() as temp_dir:
@@ -79,6 +107,9 @@ class RootInstallTest(unittest.TestCase):
             self.assertEqual(
                 (home / ".zprofile").resolve(), self.zprofile_source_file
             )
+            self.assertTrue((home / ".config/rex").is_symlink())
+            self.assertEqual((home / ".config/rex").resolve(), self.rex_source_dir)
+            self.assertFalse((home / ".config/rex.bk").exists())
             self.assertFalse((home / ".config/nvim.bk").exists())
             self.assertFalse((home / ".config/ghostty.bk").exists())
             self.assertFalse((home / ".config/starship.toml.bk").exists())
