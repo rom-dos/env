@@ -10,7 +10,7 @@ rex.bind("ctrl+b>p", "client.tab.previous")
 rex.bind("ctrl+b>shift+t", "client.tab.rename")
 rex.bind("ctrl+b>shift+x", "client.tab.close")
 for index = 1, 9 do
-  rex.bind("ctrl+b>" .. index, "client.tab.goto", { index = index })
+	rex.bind("ctrl+b>" .. index, "client.tab.goto", { index = index })
 end
 
 -- Panes: split, select, zoom, close, and break out into a new tab.
@@ -24,21 +24,21 @@ rex.bind("ctrl+b>x", "pane.close")
 rex.bind("ctrl+b>shift+1", "pane.move_to_new_tab") -- !
 
 for key, direction in pairs({ h = "left", j = "down", k = "up", l = "right" }) do
-  rex.bind("ctrl+b>" .. key, "pane.focus", { direction = direction })
+	rex.bind("ctrl+b>" .. key, "pane.focus", { direction = direction })
 end
 
 -- Keep tmux's resize shortcuts as a fallback for Herdr's resize mode.
 for _, direction in ipairs({ "left", "right", "up", "down" }) do
-  -- Ctrl+arrow resizes one step, Alt+arrow resizes five.
-  -- Each resize requires the prefix (no tmux-style repeat timer).
-  rex.bind("ctrl+b>ctrl+" .. direction, "pane.resize", {
-    direction = direction,
-    amount = 1,
-  })
-  rex.bind("ctrl+b>alt+" .. direction, "pane.resize", {
-    direction = direction,
-    amount = 5,
-  })
+	-- Ctrl+arrow resizes one step, Alt+arrow resizes five.
+	-- Each resize requires the prefix (no tmux-style repeat timer).
+	rex.bind("ctrl+b>ctrl+" .. direction, "pane.resize", {
+		direction = direction,
+		amount = 1,
+	})
+	rex.bind("ctrl+b>alt+" .. direction, "pane.resize", {
+		direction = direction,
+		amount = 5,
+	})
 end
 
 -- Rex sessions correspond to Herdr workspaces.
@@ -61,3 +61,10 @@ rex.bind("ctrl+b>]", "pane.paste")
 
 -- Send a literal Ctrl+B to the terminal (including nested tmux).
 rex.bind("ctrl+b>ctrl+b", "pane.send_key", { key = "ctrl+b" })
+
+rex.bind("cmd+r", "client.mode.enter", { name = "resize" })
+
+rex.bind("resize/h", "pane.resize", { direction = "left" })
+rex.bind("resize/l", "pane.resize", { direction = "right" })
+rex.bind("resize/j", "pane.resize", { direction = "up" })
+rex.bind("resize/k", "pane.resize", { direction = "down" })
