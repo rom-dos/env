@@ -8,10 +8,11 @@ return {
   {
     "EdenEast/nightfox.nvim",
   },
+  { "reklai/colorrex.nvim" },
   {
     "LazyVim/LazyVim",
     opts = {
-      colorscheme = "carbonfox",
+      colorscheme = "colorrex",
     },
   },
 }
