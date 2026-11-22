@@ -50,6 +50,15 @@ rex.bind("ctrl+b>shift+d", "session.close")
 rex.bind("ctrl+b>shift+9", "session.previous") -- (
 rex.bind("ctrl+b>shift+0", "session.next") -- )
 
+-- Worktrees via worktrunk.
+-- Each picker opens in a floating pane; each worktree opens as its own session.
+require("worktrunk").setup({
+	merge_flags = { "--no-squash" },
+})
+rex.bind("ctrl+b>shift+g", "worktree_switch_current")
+rex.bind("ctrl+b>d", "worktree_remove")
+rex.bind("ctrl+b>shift+m", "worktree_merge")
+
 -- Shared UI actions.
 rex.bind("ctrl+b>s", "client.settings")
 rex.bind("ctrl+b>b", "client.sidebar.toggle")
