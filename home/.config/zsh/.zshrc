@@ -39,6 +39,10 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
   fi
 fi
 
+if [[ "$SYSTEM" != "navi" ]]; then
+  source $XDG_CONFIG_HOME/zsh/.zshrc-work-functions
+fi
+
 export BUN_INSTALL="$HOME/.bun"
 
 # bun completions
