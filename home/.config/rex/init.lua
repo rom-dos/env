@@ -3,6 +3,8 @@
 -- Escape cancels a pending prefix. Reload with: rex config reload
 -- Rex-only actions and the client's existing shortcuts are left unchanged.
 
+require("plannotator.annotate").setup({})
+
 -- Rex tabs correspond to Herdr tabs.
 rex.bind("ctrl+b>c", "client.tab.new")
 rex.bind("ctrl+b>n", "client.tab.next")
