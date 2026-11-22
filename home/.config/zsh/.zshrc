@@ -75,11 +75,12 @@ alias help=run-help
 eval "$(starship init zsh)"
 eval "$(luarocks path --bin)"
 
-# Notify via herdr when a long-running command finishes (Ghostty can't see commands inside herdr)
-if [[ -n "$HERDR_ENV" ]]; then
+# Notify when a long-running command finishes
+if [[ -n "$REX_SESSION" ]]; then
   autoload -Uz add-zsh-hook
   NOTIFY_THRESHOLD=5
-  NOTIFY_IGNORE=(nvim vim vi less man top htop btop ssh claude codex opencode herdr lazygit tig fzf f)
+  NOTIFY_DISMISS_AFTER=10
+  NOTIFY_IGNORE=(nvim vim vi less man top htop btop ssh claude codex opencode rex lazygit tig fzf f)
 
   _notify_preexec() {
     _notify_cmd_start=$SECONDS
@@ -95,8 +96,13 @@ if [[ -n "$HERDR_ENV" ]]; then
     (( ${NOTIFY_IGNORE[(Ie)${${(z)_notify_cmd_name}[1]}]} )) && return
     local title
     (( exit == 0 )) && title="✅ Done" || title="❌ Failed ($exit)"
-    herdr notification show "$title" --body "$_notify_cmd_name (${elapsed}s)" \
-      --sound $([[ $exit -eq 0 ]] && echo done || echo request) >/dev/null 2>&1 &!
+    local group="rex-${REX_BLOCK:-$$}"
+    {
+      terminal-notifier -title "$title" -message "$_notify_cmd_name (${elapsed}s)" \
+        -group "$group" -sound $( (( exit == 0 )) && echo Glass || echo Basso )
+      sleep $NOTIFY_DISMISS_AFTER
+      terminal-notifier -remove "$group"
+    } >/dev/null 2>&1 &!
   }
 
   add-zsh-hook preexec _notify_preexec
